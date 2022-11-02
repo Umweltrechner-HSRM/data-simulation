@@ -1,1 +1,2 @@
 websocket-client~=1.4.1
+numpy~=1.23.4

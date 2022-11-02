@@ -3,7 +3,9 @@ from time import sleep
 import json
 import time
 
+import numpy as np
 from stomp_ws.client import Client
+
 
 def on_message(message):
     print(message)
@@ -23,19 +25,13 @@ def main():
     # subscribe channel
     client.subscribe("/topic/temperature", callback=print_frame)
 
-    val = 0.0
-    toggle = 1
-
     while True:
         temperature = {
-            "value": "%.2f" % val,
+            "value": np.sin(time.time()),
             "unit": "C",
             "timestamp": time.time(),
         }
         client.send(destination="/app/temperature", body=json.dumps(temperature))
-        val = val + 0.01 * toggle
-        if val <= -1 or val >= 1:
-            toggle = toggle * -1
         sleep(0.1)
 
 
