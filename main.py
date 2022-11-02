@@ -1,17 +1,43 @@
-# This is a sample Python script.
+from time import sleep
 
-# Press Umschalt+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import json
+import time
 
+from stomp_ws.client import Client
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Strg+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def on_message(message):
+    print(message)
 
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+def print_frame(frame):
+    print(json.loads(frame.body))
+
+
+def main():
+    # open transport
+    client = Client("ws://127.0.0.1:8230/api/looping")
+
+    # connect to the endpoint
+    client.connect()
+
+    # subscribe channel
+    client.subscribe("/topic/temperature", callback=print_frame)
+
+    val = 0.0
+    toggle = 1
+
+    while True:
+        temperature = {
+            "value": "%.2f" % val,
+            "unit": "C",
+            "timestamp": time.time(),
+        }
+        client.send(destination="/app/temperature", body=json.dumps(temperature))
+        val = val + 0.01 * toggle
+        if val <= -1 or val >= 1:
+            toggle = toggle * -1
+        sleep(0.1)
+
+
+if __name__ == "__main__":
+    main()
