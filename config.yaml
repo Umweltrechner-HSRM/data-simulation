@@ -1,0 +1,35 @@
+---
+city: 'Wiesbaden'     #Aus welcher Stadt sollen die Daten stammen?
+
+pm25:                 # lungengängiger_feinstaub
+  taktung: 1          # Wiederholungsrate in s
+  seed: 0             # Zu Testzwecken es kann sein, dass der Wert über mehrere Stunden gleich bleibt. So wir ncoh ein Random wert in der Range vom seed dazuaddiert auf den echten Wert addiert, damit man Veränderungen sieht (seed = 0 -> kein seed)
+pm10:                 # einatembarer_feinstaub
+  taktung: 1
+  seed: 0
+o3:                   #ozon
+  taktung: 2
+  seed: 0
+no2:                  #stickstoffdioxid
+  taktung: 3
+  seed: 0
+so2:                  #schwefeldioxid     
+  taktung: 4
+  seed: 0
+co:                   #kohlenmonoxid     
+  taktung: 5
+  seed: 0
+t:                    #temperatur
+  taktung: 6
+  seed: 0
+p:                    #pressure Luftdruck     
+  taktung: 7
+  seed: 0
+h:                    #humidity / Feuchtigkeit     
+  taktung: 8
+  seed: 0
+w:                    #wind
+  taktung: 9
+  seed: 0
+
+aqicn_key: 'e6e52e8fc683d9fcc03235abe9db9d8bc101230b'
