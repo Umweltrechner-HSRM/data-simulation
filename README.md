@@ -37,7 +37,7 @@ Im Hauptverzeichnis liegt eine Datei `config.yaml` vor. (Ganz unten kannst du di
 3. Zu jedem Sensor kann man auch noch einen `seed` hinzufügen. Das ist vorallem zu Testzwecken interessant. Falls z.B die Temperatur über einen längeren Zeitraum gleich bleibt, können so künstlich sichtbare Schwankungen erzeugt werden. Der seed ist default mäßif auf 0, sprich es ändert sich nichts am Wert.
 
 Des weiteren gibt es noch die zufälligen Sensoren, welche man auch konfigurieren kann. Diese kommen im Betrieb neu hinzu. Konfigurieren kann man diese unter `random_sensors` folgend:
-1. `Taktung` Zeitabstände in denen der Sensor Daten schickt
+1. `taktung` Zeitabstände in denen der Sensor Daten schickt
 2. `anzahl_unterschiedlicher_sensoren` Anzahl von Sensoren die maximal simuliert werden
 3. `zeitlicher_abstand_zwischen_den_starts` Abstand in dem die Sensoren starten (damit nicht alle sensoren direkt online sind)
 4. `lifetime_pro_sensor` Wie lange ein Sensor insgesamt sendet
