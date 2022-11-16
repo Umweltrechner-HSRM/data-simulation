@@ -193,6 +193,7 @@ if __name__ == "__main__":
     feuchtigkeit_thread.start()
     wind_thread.start()
 
+    #Random sensoren erzeugen
     while True:
         for sensor_id in range(1, config['random_sensors']['anzahl_unterschiedlicher_sensoren']+1):
             random_thread = Thread(target=random_sensor, args=(sensor_id, config['random_sensors']['taktung'], config['random_sensors']['lifetime_pro_sensor']), daemon=True)
