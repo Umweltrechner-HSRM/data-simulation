@@ -200,9 +200,3 @@ if __name__ == "__main__":
             random_thread.start()
             time.sleep(config['random_sensors']['zeitlicher_abstand_zwischen_den_starts'])
         
-    
-
-    while True:
-        time.sleep(1000)
-
-    print ("Exiting Main Thread")
