@@ -12,13 +12,13 @@ from pathlib import Path
 from datetime import datetime, timezone
 import os
 
-#config einlesen
-config = yaml.safe_load(open("./config.yaml"))
 
 #Directory path ermitteln
-path = str(os.path.join(os.path.dirname(__file__), '../buffer'))
+buffer_path = str(os.path.join(os.path.dirname(__file__), '../buffer'))
+config_path = str(os.path.join(os.path.dirname(__file__), '../config.yaml'))
 
-print(path)
+#config einlesen
+config = yaml.safe_load(open(config_path))
 
 def get_station(query: str) -> str or None:
     #Doku https://aqicn.org/json-api/doc/
@@ -52,7 +52,7 @@ def get_pm25(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("lungengängiger_feinstaub data sent")
-        with open(path+"/current_lungengängiger_feinstaub.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_lungengängiger_feinstaub.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "lungengängiger_feinstaub": data['iaqi']['pm25']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -62,7 +62,7 @@ def get_pm10(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("einatembarer_feinstaub data sent")
-        with open(path+"/current_einatembarer_feinstaub.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_einatembarer_feinstaub.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "einatembarer_feinstaub": data['iaqi']['pm10']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -72,7 +72,7 @@ def get_o3(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("ozon data sent")
-        with open(path+"/current_ozon.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_ozon.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "ozon": data['iaqi']['o3']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -82,7 +82,7 @@ def get_no2(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("stickstoffdioxid data sent")
-        with open(path+"/current_stickstoffdioxid.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_stickstoffdioxid.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "stickstoffdioxid": data['iaqi']['no2']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -92,7 +92,7 @@ def get_so2(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("Humidity data sent")
-        with open(path+"/current_schwefeldioxid.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_schwefeldioxid.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "schwefeldioxid": data['iaqi']['so2']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -102,7 +102,7 @@ def get_co(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("kohlenmonoxid data sent")
-        with open(path+"/current_kohlenmonoxid.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_kohlenmonoxid.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "kohlenmonoxid": data['iaqi']['co']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -112,7 +112,7 @@ def get_t(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("temperature data sent")
-        with open(path+"/current_temperature.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_temperature.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "temperature": data['iaqi']['t']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -122,7 +122,7 @@ def get_p(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("pressure data sent")
-        with open(path+"/current_pressure.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_pressure.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "pressure": data['iaqi']['p']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -132,7 +132,7 @@ def get_h(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("Humidity data sent")
-        with open(path+"/current_humidity.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_humidity.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "humidity": data['iaqi']['h']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -142,7 +142,7 @@ def get_w(taktung, seed, city):
     while True:
         data = get_city_data(city)
         print("wind data sent")
-        with open(path+"/current_wind.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+"/current_wind.json", 'w', encoding="utf-8") as f:
             json.dump({"time": data['time']['iso'], "wind": data['iaqi']['w']['v']+random.randint(-seed, seed)}, f, ensure_ascii=False)
         time.sleep(taktung)
     return
@@ -157,7 +157,7 @@ def random_sensor(id, taktung, lifetime):
         # convert UTC time to ISO 8601 format
         iso_date = utc_dt.astimezone().isoformat()
         print("Sensor:", id ," data sent")
-        with open(path+f"/current_Sensor{id}.json", 'w', encoding="utf-8") as f:
+        with open(buffer_path+f"/current_Sensor{id}.json", 'w', encoding="utf-8") as f:
             json.dump({"time": iso_date, "value": random.randint(1, 100)}, f, ensure_ascii=False)
         time.sleep(taktung)
     print("Sensor: ", id , "hört auf zu senden")
@@ -166,7 +166,7 @@ def random_sensor(id, taktung, lifetime):
 
 if __name__ == "__main__":
     #pprint.pprint(get_city_data("Wiesbaden"))
-    print("path:", path)
+    print("path:", buffer_path)
     print("Sensoren werden gestartet")
 
     # Create new threads
