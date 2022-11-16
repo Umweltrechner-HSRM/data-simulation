@@ -153,7 +153,7 @@ def random_sensor(id, taktung, lifetime):
     t_end = time.time() + lifetime
     while time.time() < t_end:
         # get current datetime in UTC
-        utc_dt = datetime.now(timezone.utc)
+        utc_dt = datetime.now(timezone.utc).replace(microsecond=0)
         # convert UTC time to ISO 8601 format
         iso_date = utc_dt.astimezone().isoformat()
         print("Sensor:", id ," data sent")
