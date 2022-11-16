@@ -9,6 +9,7 @@ import time
 import json
 import random
 from pathlib import Path
+from datetime import datetime, timezone
 import os
 
 #config einlesen
@@ -146,6 +147,23 @@ def get_w(taktung, seed, city):
         time.sleep(taktung)
     return
 
+def random_sensor(id, taktung, lifetime):
+    #zufälliger wert
+    print("Sensor: ", id , "beginnt zu senden")
+    t_end = time.time() + lifetime
+    while time.time() < t_end:
+        # get current datetime in UTC
+        utc_dt = datetime.now(timezone.utc)
+        # convert UTC time to ISO 8601 format
+        iso_date = utc_dt.astimezone().isoformat()
+        print("Sensor:", id ," data sent")
+        with open(path+f"/current_Sensor{id}.json", 'w', encoding="utf-8") as f:
+            json.dump({"time": iso_date, "value": random.randint(1, 100)}, f, ensure_ascii=False)
+        time.sleep(taktung)
+    print("Sensor: ", id , "hört auf zu senden")
+    return
+    
+
 if __name__ == "__main__":
     #pprint.pprint(get_city_data("Wiesbaden"))
     print("path:", path)
@@ -162,7 +180,7 @@ if __name__ == "__main__":
     luftdruck_thread = Thread(target=get_p, args=(config['p']['taktung'], config['p']['seed'], config['city']), daemon=True)
     feuchtigkeit_thread = Thread(target=get_h, args=(config['h']['taktung'], config['h']['seed'], config['city']), daemon=True)
     wind_thread = Thread(target=get_w, args=(config['w']['taktung'], config['w']['seed'], config['city']), daemon=True)
-    
+
     # Start new Threads
     lungengängiger_feinstaub_thread.start()
     einatembarer_feinstaub_thread.start()
@@ -174,6 +192,14 @@ if __name__ == "__main__":
     luftdruck_thread.start()
     feuchtigkeit_thread.start()
     wind_thread.start()
+
+    while True:
+        for sensor_id in range(1, config['random_sensors']['anzahl_unterschiedlicher_sensoren']+1):
+            random_thread = Thread(target=random_sensor, args=(sensor_id, config['random_sensors']['taktung'], config['random_sensors']['lifetime_pro_sensor']), daemon=True)
+            random_thread.start()
+            time.sleep(config['random_sensors']['zeitlicher_abstand_zwischen_den_starts'])
+        
+    
 
     while True:
         time.sleep(1000)
