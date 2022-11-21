@@ -32,4 +32,10 @@ w:                    #wind
   taktung: 9
   seed: 0
 
+random_sensors:
+  taktung: 5
+  anzahl_unterschiedlicher_sensoren: 50
+  zeitlicher_abstand_zwischen_den_starts: 1
+  lifetime_pro_sensor: 40
+
 aqicn_key: 'e6e52e8fc683d9fcc03235abe9db9d8bc101230b'
