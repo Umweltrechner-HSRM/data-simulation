@@ -32,8 +32,7 @@ def main():
             "timestamp": time.time(),
         }
         client.send(destination="/app/temperature", body=json.dumps(temperature))
-        sleep(0.1)
-
+        sleep(1)
 
 if __name__ == "__main__":
     main()
