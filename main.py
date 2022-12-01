@@ -2,6 +2,7 @@ from time import sleep
 
 import json
 import time
+import random
 
 import numpy as np
 from stomp_ws.client import Client
@@ -27,12 +28,12 @@ def main():
 
     while True:
         temperature = {
-            "value": np.sin(time.time()),
+            "value": np.sin(time.time())*2,
             "unit": "C",
-            "timestamp": time.time(),
+            "timestamp": time.time() * 1000,
         }
         client.send(destination="/app/temperature", body=json.dumps(temperature))
-        sleep(0.1)
+        sleep(1)
 
 
 if __name__ == "__main__":
