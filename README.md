@@ -82,3 +82,11 @@ random_sensors:
   zeitlicher_abstand_zwischen_den_starts: 1
   lifetime_pro_sensor: 40
 ```
+
+
+# Fehler die abzufangen sind
+- Sensoren die es nicht gibt
+- Städte, die es nicht gibt
+- stadt gibt es nicht aber sensor
+- Testen
+- logging
