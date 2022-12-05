@@ -292,28 +292,31 @@ def random_city_sensor(city, taktung, lifetime):
     
 
 if __name__ == "__main__":
-    print("Sensoren werden gestartet")
+    print("Aktivierte Sensoren werden gestartet")
 
-    #Start specified citys 
-    for city in config['city_configuration']:
-        current_city = list(city.keys())[0]
-        for sensor in city[current_city]:
-            sensor_thread = Thread(target=get_sensor_from_city, args=(sensor['sensor'], sensor['taktung'], sensor['seed'], current_city), daemon=True)
-            sensor_thread.start()
+    #Starte konfigurierte citys 
+    if config['aktive_sensoren']['configured_citys']:
+        for city in config['city_configuration']:
+            current_city = list(city.keys())[0]
+            for sensor in city[current_city]:
+                sensor_thread = Thread(target=get_sensor_from_city, args=(sensor['sensor'], sensor['taktung'], sensor['seed'], current_city), daemon=True)
+                sensor_thread.start()
     
     #Start Heger Spezial
-    heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['intervall'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
-    heger_thread.start()
+    if config['aktive_sensoren']['heger_spezial']:
+        heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['intervall'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
+        heger_thread.start()
 
     # Random city_sensoren
-    random_citys = get_number_of_valid_unused_citys(config['random_citys'], config['random_citys_sensors']['anzahl_unterschiedlicher_citys'] )
-    print("Random_citys: ", random_citys)
-    while True:
-        for city in  random_citys:
-            print("city: ", city)
-            random_city_thread = Thread(target=random_city_sensor, args=(city, config['random_citys_sensors']['taktung'], config['random_citys_sensors']['lifetime_pro_city']), daemon=True)
-            random_city_thread.start()
-            time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
+    if config['aktive_sensoren']['random_citys']:
+        random_citys = get_number_of_valid_unused_citys(config['random_citys'], config['random_citys_sensors']['anzahl_unterschiedlicher_citys'] )
+        print("Random_citys: ", random_citys)
+        while True:
+            for city in  random_citys:
+                print("city: ", city)
+                random_city_thread = Thread(target=random_city_sensor, args=(city, config['random_citys_sensors']['taktung'], config['random_citys_sensors']['lifetime_pro_city']), daemon=True)
+                random_city_thread.start()
+                time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
 
     while True:
         time.sleep(1000000)

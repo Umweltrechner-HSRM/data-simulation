@@ -44,6 +44,12 @@ sensor_details:
     unit: 'mph'
     description: 'Sensor gibt Informationen über die Windstaerke'
 
+#Active Sensoren
+aktive_sensoren:
+  configured_citys: True
+  heger_spezial: True
+  random_citys: True
+
 #Konfiguration der Heger Spezial Funktion
 heger_spezial:         #Ein Wert wie _TT_TT
   taktung: 0.1
