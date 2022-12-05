@@ -33,6 +33,7 @@ def generate_city_sensor_map(city_list):
     ## über welche Sensoren diese Stadt verfügt
     """
     result = []
+    result2 = []
     with open(city_list, encoding='utf-8') as json_file:
         data = json.load(json_file) 
         for city in data:
@@ -41,10 +42,11 @@ def generate_city_sensor_map(city_list):
             if city_data is None:
                 continue
             if city_data['iaqi'] is not None:
+                result2.append(city)
                 result.append({'city': city, 'sensors': list(city_data['iaqi'].keys())})
 
     with open(city_sensor_path, "w", encoding='utf-8') as jsonfile:
-        json.dump(result,jsonfile,ensure_ascii=False)
+        json.dump(result2,jsonfile,ensure_ascii=False)
 
 if __name__ == "__main__":
 
