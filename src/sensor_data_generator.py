@@ -9,6 +9,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 import os
 
+from stomp_ws.client import Client
+
 #Directory path ermitteln
 buffer_path = str(os.path.join(os.path.dirname(__file__), '../buffer'))
 config_path = str(os.path.join(os.path.dirname(__file__), '../config.yaml'))
@@ -75,25 +77,41 @@ def send_response_to_backend(response):
     api/{sensorName} -> Websocket -> siehe mustercode "main.py" 
     s. discord chat
     """
+    client = Client("ws://127.0.0.1:8230/api/looping")
+
+    client.connect()
+
+    client.send(destination="/app/temperature", body=response)
+
     print(f"Folgende Daten wurden ans Backend versendet: {response}")
 
 def get_all_citys_from_backend():
     """
-    Brauche ich für die random citys. Es soll eine Liste zurückgebgen (aus dem be), welche alle 
+    Brauche ich für die random citys. Es soll eine Liste zurückgebgen (aus dem be), welche alle
     vertretenen Städte zurückgibt.
     SQL Kinda: "SELECT DISTICT city FROM tabelle;"
     """
-    return ['Wiesbaden', 'Mainz']
+    listOfSensors = requests.get("/api/sensors")
+    listOfCitys = []
+    if(listOfSensors.status_code != 200):
+        print(f'an Error accured while getting the sensors for all citys (Error Code: {listOfSensors.status_code}"')
+    for sensor in listOfSensors.text:
+        listOfCitys.append(sensor.location)
+    return listOfCitys
 
 def get_all_sensors_from_backend():
     """
     Diese Methode gibt alle Sensoren zurück, welche bereits in der Datenbank registriert sind
     api/sensors GET -> Liste von allen registrierten
     """
-    #Das ist nur vorrübergehend
-    return ['10036_pm25', '10036_pm10', '10036_o3', '10036_no2', '10036_so2', '10036_co', '10036_t', '10036_p', '10036_h', '10036_w']
+    listOfSensors = requests.get("/api/sensors")
+    if (listOfSensors.status_code != 200):
+        print(f'an Error accured while getting the sensors (Error Code: {listOfSensors.status_code}"')
+    return listOfSensors
 
 def register_sensor(id, sensor, city):
+    dictionary = {'name': 34, 'b': 61, 'c': 82}
+    jsonString = json.dumps(dictionary, indent=4)
     """
     Diese Methode registriert den Sensor in der Datenbank
     api/sensor PUT -> {
@@ -103,6 +121,7 @@ def register_sensor(id, sensor, city):
     "description": "measures the temperature in Wiesbaden"
     }
     """
+
     print("Sensor: ", sensor, " der Stadt: ", city, " wurde neu registriert")
 
 #AQICN-API Funktionen
