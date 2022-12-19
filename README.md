@@ -83,6 +83,13 @@ random_sensors:
   lifetime_pro_sensor: 40
 ```
 
+# Logging Level
+
+- DEBUG: Diese Ebene wird verwendet, um detaillierte Informationen über die internen Vorgänge der Anwendung bereitzustellen. Dies wird in der Regel zu Debugging-Zwecken verwendet.
+- INFO: Diese Ebene wird verwendet, um Informationen über den normalen Betrieb der Anwendung bereitzustellen. Dies könnte Nachrichten umfassen, die anzeigen, dass eine bestimmte Funktion aufgerufen wurde oder dass ein bestimmter Codeabschnitt erreicht wurde.
+- WARNING: Diese Ebene wird verwendet, um ein mögliches Problem anzuzeigen. Dies könnte Situationen umfassen, in denen eine Anwendung weiterhin ausgeführt wird, aber etwas Unerwartetes passiert ist.
+- ERROR: Diese Ebene wird verwendet, um ein ernstes Problem anzuzeigen, das aufgetreten ist. Dies könnte Situationen umfassen, in denen die Anwendung eine bestimmte Operation nicht ausführen kann oder in denen eine Ausnahme ausgelöst wurde.
+- CRITICAL: Diese Ebene wird verwendet, um ein kritischen Problem anzuzeigen, das aufgetreten ist. Dies könnte Situationen umfassen, in denen die Anwendung nicht mehr verwendbar ist oder in denen Daten verloren gegangen sind.
 
 # Fehler die abzufangen sind
 - Sensoren die es nicht gibt
