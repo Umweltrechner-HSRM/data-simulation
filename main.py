@@ -1,10 +1,9 @@
-from time import sleep
-
 import json
 import time
-import random
+from time import sleep
 
 import numpy as np
+
 from stomp_ws.client import Client
 
 
@@ -18,7 +17,7 @@ def print_frame(frame):
 
 def main():
     # open transport
-    client = Client("ws://127.0.0.1:8230/api/looping")
+    client = Client("wss://api.sensorguard.systems/api/looping")
 
     # connect to the endpoint
     client.connect()
@@ -33,6 +32,8 @@ def main():
             "timestamp": time.time() * 1000,
         }
         client.send(destination="/app/temperature", body=json.dumps(temperature))
+        client.send(destination="/app/pressure", body=json.dumps(temperature))
+        client.send(destination="/app/o2", body=json.dumps(temperature))
         sleep(1)
 
 
