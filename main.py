@@ -1,4 +1,6 @@
 import json
+import math
+import random
 import time
 from time import sleep
 
@@ -31,9 +33,26 @@ def main():
             "unit": "C",
             "timestamp": time.time() * 1000,
         }
-        client.send(destination="/app/temperature", body=json.dumps(temperature))
-        client.send(destination="/app/pressure", body=json.dumps(temperature))
-        client.send(destination="/app/o2", body=json.dumps(temperature))
+        pressure = {
+            "value": np.cos(time.time()),
+            "unit": "C",
+            "timestamp": time.time() * 1000,
+        }
+        o2 = {
+            "value": math.tan(time.time()),
+            "unit": "C",
+            "timestamp": time.time() * 1000,
+        }
+
+        if random.randint(1, 20) % 2 == 0:
+            client.send(destination="/app/temperature", body=json.dumps(temperature))
+
+        if random.randint(1, 30) % 2 == 0:
+            client.send(destination="/app/pressure", body=json.dumps(pressure))
+
+        if random.randint(1, 30) % 2 == 0:
+            client.send(destination="/app/o2", body=json.dumps(o2))
+
         sleep(1)
 
 
