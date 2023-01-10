@@ -3,6 +3,10 @@ aqicn_key: 'e6e52e8fc683d9fcc03235abe9db9d8bc101230b'
 
 #Allgemeine Informationen über die einzelnen Sensoren
 sensor_details:
+  heger_spezial_sensor:
+    name: 'heger_spezial_sensor'
+    unit: 'Takte'
+    description: 'Sensor wechselt in einem gegebenen Intervall zwischen einem gegeben min und max wert'
   pm25:
     name: 'lungengängiger_feinstaub'
     unit: 'µg/m3'
@@ -54,25 +58,32 @@ sensor_details:
   r:
     name: 'r_point'
     unit: '%'
-    description: 'Kein Plan was das fü ein wert sein soll'
+    description: 'Kein Plan was r für ein wert sein soll'
+  d: 
+    name: 'd_point'
+    unit: '%'
+    description: 'Kein Plan was d für ein wert sein soll'
+  
 
 #Active Sensoren
 aktive_sensoren:
-  configured_citys: True
+  configured_citys: False
   heger_spezial: True
-  random_citys: True
+  random_citys: False
 
 #Konfiguration der Heger Spezial Funktion
 heger_spezial:         #Ein Wert wie _TT_TT
-  taktung: 30
-  intervall: 5          
+  id: HegerSpezial1
+  sensor_art: heger_spezial_sensor
+  city: imagination_island
+  taktung: 5
+  intervall: 10        
   max_value: 1
   min_value: -1
-
 #Konfiguration der zufälligen Städte mit ihren Sensoren
 random_citys_sensors:
-  taktung: 5
-  anzahl_unterschiedlicher_citys: 3
+  taktung: 200
+  anzahl_unterschiedlicher_citys: 1
   zeitlicher_abstand_zwischen_den_starts: 15
   lifetime_pro_city: 40
 

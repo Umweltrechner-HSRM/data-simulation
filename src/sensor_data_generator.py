@@ -8,7 +8,7 @@ import time
 import json
 import random
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from stomp_ws.client import Client
 
 #Directory path ermitteln
@@ -24,8 +24,6 @@ client = Client("wss://api.sensorguard.systems/api/looping")
 
 # connect to the endpoint
 client.connect()
-
-
 
 #Hilfsfunktionen
 def printTable(myDict, colList=None):
@@ -43,13 +41,16 @@ def printTable(myDict, colList=None):
    print("")
 
 def generate_seonsor_name(umweltstation_id, sensor):
+    """
+    Aus umweltstation_id und sensor Sensornamen generieren
+    """
     return f'sensor_{umweltstation_id}_{sensor}'
 
 def generate_response(id, time, value, city):
     """
     Erzeugt ein dicitionary aus: id, time, value, city 
     """
-    #Response vorbereiten
+    #Response erzeugen
     response = {}
     response['id'] = id
     response['time'] = time
@@ -300,33 +301,120 @@ def get_heger_spezial(taktung, intervall, max_value, min_value):
     Hier solle eine Kurve mit harten Kanten simuliert werden so wie _TT_
     """
     #Startwerte festlegen
+    print("HIEEER")
     current_value = max_value
-    t_start = time.time()
 
     while True:
         #Hier schauen wir dass nach jedem Intervall zwischen dem min und max value gewechselt wird
-        if (time.time() < t_start + intervall):
-            if (current_value == max_value):
-                current_value = min_value
-                t_start = time.time()
-            else:
-                current_value = max_value
-                t_start = time.time()
+        # print("Hegerloop")
+        # print("start: ", t_start, "zusammen", t_start + timedelta(seconds=10))
+        # if (datetime.now() < t_start + timedelta(seconds=10)):
+        #     if (current_value == max_value):
+        #         print("Heger max", current_value )
+        #         current_value = min_value
+        #         t_start = datetime.now()
+        #     else:
+        #         print("Heger min", current_value )
+        #         current_value = max_value
+        #         t_start = datetime.now()
+        if current_value == max_value:
+            #Zeit im richtigen Format errechnen
+            utc_dt = datetime.now(timezone.utc)
+            iso_date = utc_dt.astimezone().isoformat()
 
-        #Zeit im richtigen Format errechnen
-        utc_dt = datetime.now(timezone.utc).replace(microsecond=0)
-        iso_date = utc_dt.astimezone().isoformat()
+            
+            #Wurde der Sensor bereits registriert?
+            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
+                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
 
-        #Response vorbereiten
-        response = generate_response('HegerSpezial1', iso_date, current_value, 'imagination_Island')
+            #Response vorbereiten
+            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
 
-        #Response versenden
-        send_response_to_backend(response)
-        with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
-            json.dump(response, f, ensure_ascii=False)
+            #Response versenden
+            send_response_to_backend(response)
+            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
+                json.dump(response, f, ensure_ascii=False)
+            #TEIL2
+            current_value = min_value
+            
 
-        #Sensor pausieren bis zum nächsten Takt
+
+            dt_object = datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%S.%f%z')
+            # Add one second to the datetime object
+            dt_object += timedelta(milliseconds=1)
+            # Format the datetime object as a string
+            offset = dt_object.strftime("%z")
+            offset = offset[:3] + ":" + offset[3:]
+            iso_date = dt_object.strftime('%Y-%m-%dT%H:%M:%S.%f') + offset
+
+
+
+
+
+            #Zeit im richtigen Format errechnen
+            
+            #Wurde der Sensor bereits registriert?
+            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
+                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
+
+            #Response vorbereiten
+            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
+
+            #Response versenden
+            send_response_to_backend(response)
+            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
+                json.dump(response, f, ensure_ascii=False)
+
+        else: 
+            #Zeit im richtigen Format errechnen
+            utc_dt = datetime.now(timezone.utc)
+            iso_date = utc_dt.astimezone().isoformat()
+
+            #Wurde der Sensor bereits registriert?
+            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
+                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
+
+            #Response vorbereiten
+            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
+
+            #Response versenden
+            send_response_to_backend(response)
+            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
+                json.dump(response, f, ensure_ascii=False)
+            #TEIL2
+            current_value = max_value
+            
+            #Zeit im richtigen Format errechnen
+
+
+
+            dt_object = datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%S.%f%z')
+            # Add one second to the datetime object
+            dt_object += timedelta(milliseconds=1)
+            # Format the datetime object as a string
+            offset = dt_object.strftime("%z")
+            offset = offset[:3] + ":" + offset[3:]
+            iso_date = dt_object.strftime('%Y-%m-%dT%H:%M:%S.%f') + offset
+
+
+
+
+            
+            #Wurde der Sensor bereits registriert?
+            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
+                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
+
+            #Response vorbereiten
+            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
+
+            #Response versenden
+            send_response_to_backend(response)
+            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
+                json.dump(response, f, ensure_ascii=False)
+
         time.sleep(taktung)
+
+
 
 
 def random_city_sensor(city, taktung, lifetime):
