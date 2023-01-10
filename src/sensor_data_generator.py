@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append('./')
 import requests
 import yaml
 from threading import Thread
@@ -7,7 +9,7 @@ import json
 import random
 from pathlib import Path
 from datetime import datetime, timezone
-import os
+from stomp_ws.client import Client
 
 #Directory path ermitteln
 buffer_path = str(os.path.join(os.path.dirname(__file__), '../buffer'))
@@ -15,6 +17,15 @@ config_path = str(os.path.join(os.path.dirname(__file__), '../config.yaml'))
 
 #config einlesen
 config = yaml.safe_load(open(config_path, encoding='utf-8'))
+
+#Mit Websocket verbinden
+# open transport
+client = Client("wss://api.sensorguard.systems/api/looping")
+
+# connect to the endpoint
+client.connect()
+
+
 
 #Hilfsfunktionen
 def printTable(myDict, colList=None):
@@ -30,6 +41,9 @@ def printTable(myDict, colList=None):
    myList.insert(1, ['-' * i for i in colSize]) # Seperating line
    for item in myList: print(formatStr.format(*item))
    print("")
+
+def generate_seonsor_name(umweltstation_id, sensor):
+    return f'sensor_{umweltstation_id}_{sensor}'
 
 def generate_response(id, time, value, city):
     """
@@ -69,6 +83,21 @@ def get_number_of_valid_unused_citys(random_citys, anzahl_unterschiedlicher_stä
 
 
 #Backend Kommunikation
+def get_keycloak_token():
+    url = "https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token"
+    #ToDo user user updaten
+    payload = "client_id=umweltrechner-backend&username=user&password=user&grant_type=password&client_secret=9ogIS2Mf9tcAuIDvkmzJ5KskixmAoKll"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    return response.json()['access_token']
+
+
+#Get Keycloak Token
+token = get_keycloak_token()
+
+
 def send_response_to_backend(response):
     """
     Diese Methode bekommt eine Json Datei übergeben und schickt diese an das Backend
@@ -77,33 +106,74 @@ def send_response_to_backend(response):
     """
     print(f"Folgende Daten wurden ans Backend versendet: {response}")
 
+    dest = f"/app/{response['id']}"
+    client.send(destination=dest, body=json.dumps(response))
+    return
+
 def get_all_citys_from_backend():
     """
     Brauche ich für die random citys. Es soll eine Liste zurückgebgen (aus dem be), welche alle 
     vertretenen Städte zurückgibt.
     SQL Kinda: "SELECT DISTICT city FROM tabelle;"
     """
-    return ['Wiesbaden', 'Mainz']
+
+    #TODO optimieren im Backend
+
+    url = "https://api.sensorguard.systems/api/sensor"
+    headers = {        
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    response = requests.request("GET", url, headers=headers)
+
+    all_citys = [value['location'] for value in response.json()]
+    
+    return all_citys
+    #return ['Wiesbaden', 'Mainz']
 
 def get_all_sensors_from_backend():
     """
     Diese Methode gibt alle Sensoren zurück, welche bereits in der Datenbank registriert sind
     api/sensors GET -> Liste von allen registrierten
     """
+
+    #TODO optimieren im Backend
+
+    url = "https://api.sensorguard.systems/api/sensor"
+    headers = {        
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    response = requests.request("GET", url, headers=headers)
+
+    all_sensors = [value['name'] for value in response.json()]
+
     #Das ist nur vorrübergehend
-    return ['10036_pm25', '10036_pm10', '10036_o3', '10036_no2', '10036_so2', '10036_co', '10036_t', '10036_p', '10036_h', '10036_w']
+    #return ['10036_pm25', '10036_pm10', '10036_o3', '10036_no2', '10036_so2', '10036_co', '10036_t', '10036_p', '10036_h', '10036_w']
+    return all_sensors
 
 def register_sensor(id, sensor, city):
     """
     Diese Methode registriert den Sensor in der Datenbank
-    api/sensor PUT -> {
-    "name" : "temp_1",
-    "location": "Wiesbaden",
-    "unit": "C",
-    "description": "measures the temperature in Wiesbaden"
-    }
     """
     print("Sensor: ", sensor, " der Stadt: ", city, " wurde neu registriert")
+
+    url = "https://api.sensorguard.systems/api/sensor"
+
+    payload = {
+        "name": id,
+        "location": city,
+        "unit": config['sensor_details'][sensor]['unit'],
+        "description": config['sensor_details'][sensor]['description'],
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+    response = requests.request("PUT", url, json=payload, headers=headers)
+    return
 
 #AQICN-API Funktionen
 def get_station_data(uid: str) -> dict or None:
@@ -196,8 +266,9 @@ def get_sensor_from_city(sensor, taktung, seed, city):
         raise Exception(f"ERROR: {umweltstation_id} Zu der Stadt: {city}, gibt es den Sensor: {sensor} nicht")
 
     #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
-    id = f'{umweltstation_id}_{sensor}'
-    if id in get_all_sensors_from_backend():
+    id = generate_seonsor_name(umweltstation_id, sensor)
+
+    if id not in get_all_sensors_from_backend():
         #Registriere Sensor in der Datenbank
         register_sensor(id, sensor, city)
 
@@ -260,7 +331,7 @@ def get_heger_spezial(taktung, intervall, max_value, min_value):
 
 def random_city_sensor(city, taktung, lifetime):
     #Sagen, dass die Stadt beginnt zu senden
-    print("City: ", city, "beginnt zu senden")
+    print("Random_City: ", city, "beginnt zu senden")
 
     #Umweltstation zur Stadt finden
     umweltstation_id = get_biggest_station_of_city(city)
@@ -274,8 +345,8 @@ def random_city_sensor(city, taktung, lifetime):
         for sensor in list(data['iaqi'].keys()):
 
             #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
-            id = f'{umweltstation_id}_{sensor}'
-            if id in get_all_sensors_from_backend():
+            id = generate_seonsor_name(umweltstation_id, sensor)
+            if id not in get_all_sensors_from_backend():
                 #Registriere Sensor in der Datenbank
                 register_sensor(id, sensor, city)
 
@@ -294,6 +365,8 @@ def random_city_sensor(city, taktung, lifetime):
 if __name__ == "__main__":
     print("Aktivierte Sensoren werden gestartet")
 
+    
+
     #Starte konfigurierte citys 
     if config['aktive_sensoren']['configured_citys']:
         for city in config['city_configuration']:
@@ -310,7 +383,7 @@ if __name__ == "__main__":
     # Random city_sensoren
     if config['aktive_sensoren']['random_citys']:
         random_citys = get_number_of_valid_unused_citys(config['random_citys'], config['random_citys_sensors']['anzahl_unterschiedlicher_citys'] )
-        print("Random_citys: ", random_citys)
+        print("Random_citys:list: ", random_citys)
         while True:
             for city in  random_citys:
                 print("city: ", city)

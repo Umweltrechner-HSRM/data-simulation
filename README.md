@@ -1,6 +1,12 @@
 # Datensimulator
+Todo:
+- Testing
+- Logging
+- Doku
+
 ### Was macht das Skript?
 Dieses Skript ermittelt die echten und aktuellen Air Quality Daten einer Stadt und legt diese dann im Buffer ab.
+
 ### Welche Werte könne ermittet werden?
 Je nachdem welche Stadt angeben wird kann die Vielfalt der Sensoren schwanken. So gibt es in Mainz z.B relativ wenig Daten, während man in Wiesbaden folgende erhält:
 
