@@ -10,10 +10,16 @@ import random
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from stomp_ws.client import Client
+import os
+import logging
 
-#Directory path ermitteln
-buffer_path = str(os.path.join(os.path.dirname(__file__), '../buffer'))
-config_path = str(os.path.join(os.path.dirname(__file__), '../config.yaml'))
+# Globale Variablen anlegen
+
+#Directory paths ermitteln
+src_path = str(os.path.dirname(__file__))
+buffer_path = str(os.path.join(src_path, '../buffer'))
+config_path = str(os.path.join(src_path, '../config.yaml'))
+log_path = str(os.path.join(src_path, '../logs'))
 
 #config einlesen
 config = yaml.safe_load(open(config_path, encoding='utf-8'))
@@ -24,6 +30,9 @@ client = Client("wss://api.sensorguard.systems/api/looping")
 
 # connect to the endpoint
 client.connect()
+#Logger anlegen
+log_level = config['log_level']
+logging.basicConfig(handlers=[logging.FileHandler(os.path.join(log_path, 'data-simulation.log'), 'w', 'utf-8')], level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 #Hilfsfunktionen
 def printTable(myDict, colList=None):
@@ -79,6 +88,7 @@ def get_number_of_valid_unused_citys(random_citys, anzahl_unterschiedlicher_stä
         
         # Ist die gewünschte Menge von unterschiedlichen Städten erfüllt, werden diese zurück gegeben
         if len(result_citys) == anzahl_unterschiedlicher_städte:
+            logging.info(f"Zufällige Städte welche noch nicht benutzt wurden: {result_citys}")
             return result_citys
     return
 
@@ -448,10 +458,10 @@ def random_city_sensor(city, taktung, lifetime):
         time.sleep(taktung)
     print("City: ", city , "hört auf zu senden")
     return
-    
 
 if __name__ == "__main__":
-    print("Aktivierte Sensoren werden gestartet")
+    logging.info("...")
+    logging.info("AKTIVIERTE SENSOREN STARTEN")
 
     
 
@@ -462,11 +472,13 @@ if __name__ == "__main__":
             for sensor in city[current_city]:
                 sensor_thread = Thread(target=get_sensor_from_city, args=(sensor['sensor'], sensor['taktung'], sensor['seed'], current_city), daemon=True)
                 sensor_thread.start()
+                logging.info(f"Starte konfigurierten Sensor ARGS: - Stadt: {current_city} - Sensor: {sensor['sensor']} - Taktung: {sensor['taktung']} - Seed: {sensor['seed']}")
     
     #Start Heger Spezial
     if config['aktive_sensoren']['heger_spezial']:
         heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['intervall'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
         heger_thread.start()
+        logging.info(f"Starte Heger Spezial ARGS: - Taktung: {config['heger_spezial']['taktung']} - Intervall: {config['heger_spezial']['intervall']} - Max Value: {config['heger_spezial']['max_value']}, - Min value: {config['heger_spezial']['min_value']}")
 
     # Random city_sensoren
     if config['aktive_sensoren']['random_citys']:
@@ -474,9 +486,9 @@ if __name__ == "__main__":
         print("Random_citys:list: ", random_citys)
         while True:
             for city in  random_citys:
-                print("city: ", city)
                 random_city_thread = Thread(target=random_city_sensor, args=(city, config['random_citys_sensors']['taktung'], config['random_citys_sensors']['lifetime_pro_city']), daemon=True)
                 random_city_thread.start()
+                logging.info(f"Starte zufällige Stadt: ARGS: - Stadt: {city} - Taktung: {config['random_citys_sensors']['taktung']} - City-Lifetime: {config['random_citys_sensors']['lifetime_pro_city']}")
                 time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
 
     while True:
