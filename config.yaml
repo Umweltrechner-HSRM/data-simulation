@@ -3,6 +3,12 @@ log_level: INFO                              # Mögliche Parameter: DEBUG, INFO,
 
 aqicn_key: 'e6e52e8fc683d9fcc03235abe9db9d8bc101230b'
 
+#Backend-Konfiguration
+backend:
+  username: 'user'
+  password: 'user'
+  keycloak_url: 'https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token' 
+  send_response_path: '/app/'
 
 
 #Allgemeine Informationen über die einzelnen Sensoren
@@ -80,8 +86,7 @@ heger_spezial:         #Ein Wert wie _TT_TT
   id: HegerSpezial1
   sensor_art: heger_spezial_sensor
   city: imagination_island
-  taktung: 5
-  intervall: 10        
+  taktung: 5  
   max_value: 1
   min_value: -1
 #Konfiguration der zufälligen Städte mit ihren Sensoren

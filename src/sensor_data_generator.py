@@ -30,6 +30,7 @@ client = Client("wss://api.sensorguard.systems/api/looping")
 
 # connect to the endpoint
 client.connect()
+
 #Logger anlegen
 log_level = config['log_level']
 logging.basicConfig(handlers=[logging.FileHandler(os.path.join(log_path, 'data-simulation.log'), 'w', 'utf-8')], level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -49,6 +50,16 @@ def printTable(myDict, colList=None):
    for item in myList: print(formatStr.format(*item))
    print("")
 
+def convert_time_from_iso8601_to_unix_milli_timestamp(iso_time):
+    """
+    Diese Methode bekommt eine Zeit im ISO 8601 Format übergeben und wandelt diese in einen UNIX Timestamp mit Millisekunden um
+    """
+    # Konvertiere Zeitstempel in ein datetime-Objekt
+    time_obj = datetime.fromisoformat(iso_time)
+    # Konvertiere Sie das datetime-Objekt in einen UNIX-Timestamp in Millisekunden
+    unix_timestamp = int(time_obj.timestamp() * 1000)
+    return unix_timestamp
+
 def generate_seonsor_name(umweltstation_id, sensor):
     """
     Aus umweltstation_id und sensor Sensornamen generieren
@@ -62,7 +73,7 @@ def generate_response(id, time, value, city):
     #Response erzeugen
     response = {}
     response['id'] = id
-    response['time'] = time
+    response['timestamp'] = time
     response['value'] = value
     response['city'] = city
     return response
@@ -95,13 +106,19 @@ def get_number_of_valid_unused_citys(random_citys, anzahl_unterschiedlicher_stä
 
 #Backend Kommunikation
 def get_keycloak_token():
-    url = "https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token"
-    #ToDo user user updaten
-    payload = "client_id=umweltrechner-backend&username=user&password=user&grant_type=password&client_secret=9ogIS2Mf9tcAuIDvkmzJ5KskixmAoKll"
+    """
+    Diese Methode fragt mit Hilfe von username und password, den Keycloak Token ab und gibt diesen anschließend zurück
+    """
+    # Daten aus Config einlesen
+    url = config['backend']['keycloak_url']
+    username = config['backend']['username']
+    password = config['backend']['password']
+    # Anfrage bauen
+    payload = f"client_id=umweltrechner-backend&username={username}&password={password}&grant_type=password&client_secret=9ogIS2Mf9tcAuIDvkmzJ5KskixmAoKll"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-
+    # Anfrage abschicken
     response = requests.request("POST", url, data=payload, headers=headers)
-
+    # Access Token zurückgeben
     return response.json()['access_token']
 
 
@@ -111,14 +128,15 @@ token = get_keycloak_token()
 
 def send_response_to_backend(response):
     """
-    Diese Methode bekommt eine Json Datei übergeben und schickt diese an das Backend
-    api/{sensorName} -> Websocket -> siehe mustercode "main.py" 
-    s. discord chat
+    Diese Methode bekommt ein dict mit Sensordaten übergeben und sendet dieses an das Backend
     """
-    print(f"Folgende Daten wurden ans Backend versendet: {response}")
-
-    dest = f"/app/{response['id']}"
+    # Pfad aus config einlesen    
+    send_response_path = config['backend']['send_response_path']
+    # Zielpfad vorbereiten
+    dest = f"{send_response_path}{response['id']}"
+    # Daten an das Backend senden
     client.send(destination=dest, body=json.dumps(response))
+    print("Response:", response)
     return
 
 def get_all_citys_from_backend():
@@ -268,192 +286,84 @@ def get_sensor_from_city(sensor, taktung, seed, city):
     #Überprüfen, ob es zu der Stadt Sensordaten gibt
     if not city_avaiable(city):
         raise Exception(f"ERROR: Zu der Stadt: {city}, gibt es keine Sensoren") 
-
     #Umweltstation zur Stadt finden
     umweltstation_id = get_biggest_station_of_city(city)
-
     #Überprüfen, ob es den Sensor an der Wetterstation gibt
     if sensor not in get_station_sensors(umweltstation_id):
         raise Exception(f"ERROR: {umweltstation_id} Zu der Stadt: {city}, gibt es den Sensor: {sensor} nicht")
-
     #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
     id = generate_seonsor_name(umweltstation_id, sensor)
-
     if id not in get_all_sensors_from_backend():
         #Registriere Sensor in der Datenbank
         register_sensor(id, sensor, city)
-
     #Sagen, dass die Stadt beginnt zu senden
     print("City: ", city, "mit Sensor", sensor, "beginnt zu senden")
 
     while True:
         #Daten der Umweltstation erfassen
         data = get_station_data(umweltstation_id)
-
+        # Zeit umrechnern
+        timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
         #Response vorbereiten
-        response = generate_response(id, data['time']['iso'],  data['iaqi'][sensor]['v'], city)
-
+        response = generate_response(id, timestamp,  data['iaqi'][sensor]['v'], city)
         #Senden
         send_response_to_backend(response)
         with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
             json.dump(response, f, ensure_ascii=False)
-
         #Logging / Ausgabe
-        # print(f"Der: {sensor} Sensor von der Station: {umweltstation_id}  aus der Stadt: {city} hat den Wert: {response['value']} am: {response['time']} versendet")
-        # printTable([response, ])
-
         #Sensor pausieren bis zum nächsten Takt
         time.sleep(taktung)
 
 
-def get_heger_spezial(taktung, intervall, max_value, min_value):
+def get_heger_spezial(taktung, max_value, min_value):
     """
     Hier solle eine Kurve mit harten Kanten simuliert werden so wie _TT_
     """
-    #Startwerte festlegen
-    print("HIEEER")
+    #Wurde der Sensor bereits registriert?
+    if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
+        register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
+    # Variable zum speichern des aktuellen Sensorwerts
     current_value = max_value
-
     while True:
-        #Hier schauen wir dass nach jedem Intervall zwischen dem min und max value gewechselt wird
-        # print("Hegerloop")
-        # print("start: ", t_start, "zusammen", t_start + timedelta(seconds=10))
-        # if (datetime.now() < t_start + timedelta(seconds=10)):
-        #     if (current_value == max_value):
-        #         print("Heger max", current_value )
-        #         current_value = min_value
-        #         t_start = datetime.now()
-        #     else:
-        #         print("Heger min", current_value )
-        #         current_value = max_value
-        #         t_start = datetime.now()
-        if current_value == max_value:
-            #Zeit im richtigen Format errechnen
-            utc_dt = datetime.now(timezone.utc)
-            iso_date = utc_dt.astimezone().isoformat()
-
-            
-            #Wurde der Sensor bereits registriert?
-            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
-                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
-
-            #Response vorbereiten
-            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
-
-            #Response versenden
-            send_response_to_backend(response)
-            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
-                json.dump(response, f, ensure_ascii=False)
-            #TEIL2
-            current_value = min_value
-            
-
-
-            dt_object = datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%S.%f%z')
-            # Add one second to the datetime object
-            dt_object += timedelta(milliseconds=1)
-            # Format the datetime object as a string
-            offset = dt_object.strftime("%z")
-            offset = offset[:3] + ":" + offset[3:]
-            iso_date = dt_object.strftime('%Y-%m-%dT%H:%M:%S.%f') + offset
-
-
-
-
-
-            #Zeit im richtigen Format errechnen
-            
-            #Wurde der Sensor bereits registriert?
-            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
-                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
-
-            #Response vorbereiten
-            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
-
-            #Response versenden
-            send_response_to_backend(response)
-            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
-                json.dump(response, f, ensure_ascii=False)
-
-        else: 
-            #Zeit im richtigen Format errechnen
-            utc_dt = datetime.now(timezone.utc)
-            iso_date = utc_dt.astimezone().isoformat()
-
-            #Wurde der Sensor bereits registriert?
-            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
-                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
-
-            #Response vorbereiten
-            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
-
-            #Response versenden
-            send_response_to_backend(response)
-            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
-                json.dump(response, f, ensure_ascii=False)
-            #TEIL2
-            current_value = max_value
-            
-            #Zeit im richtigen Format errechnen
-
-
-
-            dt_object = datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%S.%f%z')
-            # Add one second to the datetime object
-            dt_object += timedelta(milliseconds=1)
-            # Format the datetime object as a string
-            offset = dt_object.strftime("%z")
-            offset = offset[:3] + ":" + offset[3:]
-            iso_date = dt_object.strftime('%Y-%m-%dT%H:%M:%S.%f') + offset
-
-
-
-
-            
-            #Wurde der Sensor bereits registriert?
-            if config['heger_spezial']['id'] not in get_all_sensors_from_backend():
-                register_sensor(config['heger_spezial']['id'], config['heger_spezial']['sensor_art'], config['heger_spezial']['city'])
-
-            #Response vorbereiten
-            response = generate_response(config['heger_spezial']['id'], iso_date, current_value, config['heger_spezial']['city'])
-
-            #Response versenden
-            send_response_to_backend(response)
-            with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:
-                json.dump(response, f, ensure_ascii=False)
-
+        #Zeit messen
+        timestamp = round(time.time()*1000)
+        #Response vorbereiten
+        response = generate_response(config['heger_spezial']['id'], timestamp, current_value, config['heger_spezial']['city'])
+        #Response versenden
+        send_response_to_backend(response)
+        #Jetzt muss direkt der nächste Sensordatensatz verschickt werden, um den harten Übergang zu erzeugen
+        # Zu sendenden Sensorwert wechseln
+        current_value = min_value if current_value == max_value else max_value
+        # Zeit um eine Millisekunde verschieben
+        timestamp = timestamp + 1
+        # Zweite Response vorbereiten
+        response = generate_response(config['heger_spezial']['id'], timestamp, current_value, config['heger_spezial']['city'])
+        # Zweite Response versenden
+        send_response_to_backend(response)    
+        # Warten bis zum nächsten Senden
         time.sleep(taktung)
-
-
-
 
 def random_city_sensor(city, taktung, lifetime):
     #Sagen, dass die Stadt beginnt zu senden
     print("Random_City: ", city, "beginnt zu senden")
-
     #Umweltstation zur Stadt finden
     umweltstation_id = get_biggest_station_of_city(city)
-
     t_end = time.time() + lifetime
     while time.time() < t_end:
-
         #Sensordaten erfassen
         data = get_station_data(umweltstation_id)
-
         for sensor in list(data['iaqi'].keys()):
-
             #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
             id = generate_seonsor_name(umweltstation_id, sensor)
             if id not in get_all_sensors_from_backend():
                 #Registriere Sensor in der Datenbank
                 register_sensor(id, sensor, city)
-
+            # Zeit umrechnen
+            timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
             #Response vorbereiten
-            response = generate_response(id, data['time']['iso'],  data['iaqi'][sensor]['v'], city)
-
+            response = generate_response(id, timestamp, data['iaqi'][sensor]['v'], city)
             #Sensordaten versenden
             send_response_to_backend(response)
-
         #Taktung abwarten
         time.sleep(taktung)
     print("City: ", city , "hört auf zu senden")
@@ -462,9 +372,6 @@ def random_city_sensor(city, taktung, lifetime):
 if __name__ == "__main__":
     logging.info("...")
     logging.info("AKTIVIERTE SENSOREN STARTEN")
-
-    
-
     #Starte konfigurierte citys 
     if config['aktive_sensoren']['configured_citys']:
         for city in config['city_configuration']:
@@ -476,9 +383,9 @@ if __name__ == "__main__":
     
     #Start Heger Spezial
     if config['aktive_sensoren']['heger_spezial']:
-        heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['intervall'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
+        heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
         heger_thread.start()
-        logging.info(f"Starte Heger Spezial ARGS: - Taktung: {config['heger_spezial']['taktung']} - Intervall: {config['heger_spezial']['intervall']} - Max Value: {config['heger_spezial']['max_value']}, - Min value: {config['heger_spezial']['min_value']}")
+        logging.info(f"Starte Heger Spezial ARGS: - Taktung: {config['heger_spezial']['taktung']} - Max Value: {config['heger_spezial']['max_value']}, - Min value: {config['heger_spezial']['min_value']}")
 
     # Random city_sensoren
     if config['aktive_sensoren']['random_citys']:
