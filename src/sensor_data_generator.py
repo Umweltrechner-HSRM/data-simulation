@@ -88,15 +88,15 @@ def get_number_of_valid_unused_citys(random_citys, anzahl_unterschiedlicher_stä
 
     #List aller Städte, welche schon in der Datenbank vertreten sind
     db_city_list = get_all_citys_from_backend()
-   
+
     #Mischen der Städte
     random.shuffle(random_citys)
-    
+
     for city in random_citys:
         #Überprüfen, ob es zu dieser Stadt Daten gibt und wenn ja dem result hinzufügen
         if city_avaiable(city) and city not in db_city_list:
             result_citys.append(city)
-        
+
         # Ist die gewünschte Menge von unterschiedlichen Städten erfüllt, werden diese zurück gegeben
         if len(result_citys) == anzahl_unterschiedlicher_städte:
             logging.info(f"Zufällige Städte welche noch nicht benutzt wurden: {result_citys}")
@@ -147,7 +147,7 @@ def get_all_citys_from_backend():
     """
 
     url = f"{API_BASE_URL}/sensor"
-    headers = {        
+    headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
     }
@@ -155,7 +155,7 @@ def get_all_citys_from_backend():
     response = requests.request("GET", url, headers=headers)
 
     all_citys = [value['location'] for value in response.json()]
-    
+
     return all_citys
     #return ['Wiesbaden', 'Mainz']
 
@@ -168,7 +168,7 @@ def get_all_sensors_from_backend():
     #TODO optimieren im Backend
 
     url = f"{API_BASE_URL}/sensor"
-    headers = {        
+    headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
     }
@@ -283,7 +283,7 @@ def get_sensor_from_city(sensor, taktung, seed, city):
     """
     #Überprüfen, ob es zu der Stadt Sensordaten gibt
     if not city_avaiable(city):
-        raise Exception(f"ERROR: Zu der Stadt: {city}, gibt es keine Sensoren") 
+        raise Exception(f"ERROR: Zu der Stadt: {city}, gibt es keine Sensoren")
     #Umweltstation zur Stadt finden
     umweltstation_id = get_biggest_station_of_city(city)
     #Überprüfen, ob es den Sensor an der Wetterstation gibt
@@ -301,7 +301,8 @@ def get_sensor_from_city(sensor, taktung, seed, city):
         #Daten der Umweltstation erfassen
         data = get_station_data(umweltstation_id)
         # Zeit umrechnern
-        timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
+        #timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
+        timestamp = time.time() * 1000
         #Response vorbereiten
         response = generate_response(id, timestamp,  data['iaqi'][sensor]['v'], city)
         #Senden
@@ -337,7 +338,7 @@ def get_heger_spezial(taktung, max_value, min_value):
         # Zweite Response vorbereiten
         response = generate_response(config['heger_spezial']['id'], timestamp, current_value, config['heger_spezial']['city'])
         # Zweite Response versenden
-        send_response_to_backend(response)    
+        send_response_to_backend(response)
         # Warten bis zum nächsten Senden
         time.sleep(taktung)
 
@@ -370,7 +371,7 @@ def random_city_sensor(city, taktung, lifetime):
 if __name__ == "__main__":
     logging.info("...")
     logging.info("AKTIVIERTE SENSOREN STARTEN")
-    #Starte konfigurierte citys 
+    #Starte konfigurierte citys
     if config['aktive_sensoren']['configured_citys']:
         for city in config['city_configuration']:
             current_city = list(city.keys())[0]
@@ -378,7 +379,7 @@ if __name__ == "__main__":
                 sensor_thread = Thread(target=get_sensor_from_city, args=(sensor['sensor'], sensor['taktung'], sensor['seed'], current_city), daemon=True)
                 sensor_thread.start()
                 logging.info(f"Starte konfigurierten Sensor ARGS: - Stadt: {current_city} - Sensor: {sensor['sensor']} - Taktung: {sensor['taktung']} - Seed: {sensor['seed']}")
-    
+
     #Start Heger Spezial
     if config['aktive_sensoren']['heger_spezial']:
         heger_thread = Thread(target=get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
@@ -398,4 +399,3 @@ if __name__ == "__main__":
 
     while True:
         time.sleep(1000000)
-        
