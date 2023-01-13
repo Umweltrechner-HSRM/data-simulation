@@ -54,7 +54,7 @@ Des weiteren gibt es noch die zufälligen Sensoren, welche man auch konfiguriere
 3. `zeitlicher_abstand_zwischen_den_starts` Abstand in dem die Sensoren starten (damit nicht alle sensoren direkt online sind)
 4. `lifetime_pro_sensor` Wie lange ein Sensor insgesamt sendet
 
-### Wie funktinoiert das Skript unter der Haube?
+### Wie funktioniert das Skript unter der Haube?
 Es wird diese [API](https://aqicn.org/map/wiesbaden/de/) verwendet, welche alle Sensordaten einer Stadt liefert. Da unser Skript jeder Sensor einzeln simulieren soll, werden diese Werte aufgespalten. Um die unterschiedliche Taktung (Sendezyklus) am besten simulieren zu können, arbeitet das Skript mit mehreren Threads, welche dann jeweils einen Sensor simulieren. Die Daten die diese Threads dann "erzeugen", werden als Json File im Buffer gespeichert
 
 ### Wie sieht ein erzeugtes json File aus?
