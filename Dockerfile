@@ -8,7 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN mkdir "logs"
-RUN mkdir "buffer"
-
 CMD ["python", "./src/sensor_data_generator.py"]
