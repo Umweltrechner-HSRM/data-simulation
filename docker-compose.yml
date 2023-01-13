@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  sensor-guard-datasim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sensor-guard-datasim
+    restart: always
+    volumes:
+      - ./config.yaml:/app/config.yaml

@@ -6,6 +6,9 @@ COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY data data
+COPY src src
+COPY logs logs
+COPY buffer buffer
 
 CMD ["python", "./src/sensor_data_generator.py"]
