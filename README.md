@@ -22,16 +22,22 @@ Je nachdem welche Stadt angeben wird kann die Vielfalt der Sensoren schwanken. S
 - w (Wind)
 
 ### Wie starte ich das Skript?
-Zu erst müssen alle Module heruntergeladen werden. Die Liste aller Module befindet sich in `python_requirements.txt` Jetzt muss man nur noch den Befehl usführen:
+1. Zu erst muss die config.yaml.dist in config.yaml umbenannt werden und die Werte angepasst werden.
+2. Danach müssen alle Module heruntergeladen werden. Die Liste aller Module befindet sich in `python_requirements.txt` Jetzt muss man nur noch den Befehl ausführen:
 ```
 pip install -r python_requirements.txt
 ``` 
-Dann lässt sich der Datensimulator mit folgendem Befehl starten, wenn man sich im Hauptverzeichnis befindet
+3. Dann lässt sich der Datensimulator mit folgendem Befehl starten, wenn man sich im Hauptverzeichnis befindet
 ```
 python ./src/sensor_data_generator.py
 
 ```
 Wird das Skript gestartet, bleibt es so lange am Laufen, bis es mit Strg+C abgebrochen wird. In dieser Zeit werden ständig Daten erzeugt.
+
+## Alternativ mit docker
+1. Zu erst muss die config.yaml.dist in config.yaml umbenannt werden und die Werte angepasst werden.
+2. docker-compose up -d
+3. Bei Änderungen an der config.yaml muss der Container neu gestartet werden mit docker-compose restart
 
 ### Wo finde ich die Daten?
 Die Daten liegen im Verzeichnis `buffer` als Json-Dateien vor. Später sollen diese Daten direkt verschickt werden

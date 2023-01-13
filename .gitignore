@@ -1,3 +1,3 @@
-# ignore ALL files in ANY directory named buffer
 buffer/
 logs/*
+config.yaml
