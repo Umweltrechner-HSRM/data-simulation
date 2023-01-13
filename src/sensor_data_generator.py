@@ -1,5 +1,6 @@
-import os
 import sys
+
+from stomp_ws.client import Client
 sys.path.append('./')
 import requests
 import yaml
@@ -7,9 +8,7 @@ from threading import Thread
 import time
 import json
 import random
-from pathlib import Path
-from datetime import datetime, timezone, timedelta
-from stomp_ws.client import Client
+from datetime import datetime
 import os
 import logging
 
