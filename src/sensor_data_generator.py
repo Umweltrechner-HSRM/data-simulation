@@ -22,10 +22,11 @@ log_path = str(os.path.join(src_path, '../logs'))
 
 #config einlesen
 config = yaml.safe_load(open(config_path, encoding='utf-8'))
+API_BASE_URL = config['backend']['api_base_url']
 
 #Mit Websocket verbinden
 # open transport
-client = Client("wss://api.sensorguard.systems/api/looping")
+client = Client(config['backend']['api_ws_url'])
 
 # connect to the endpoint
 client.connect()
@@ -145,9 +146,7 @@ def get_all_citys_from_backend():
     SQL Kinda: "SELECT DISTICT city FROM tabelle;"
     """
 
-    #TODO optimieren im Backend
-
-    url = "https://api.sensorguard.systems/api/sensor"
+    url = f"{API_BASE_URL}/sensor"
     headers = {        
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -168,7 +167,7 @@ def get_all_sensors_from_backend():
 
     #TODO optimieren im Backend
 
-    url = "https://api.sensorguard.systems/api/sensor"
+    url = f"{API_BASE_URL}/sensor"
     headers = {        
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -188,7 +187,7 @@ def register_sensor(id, sensor, city):
     """
     print("Sensor: ", sensor, " der Stadt: ", city, " wurde neu registriert")
 
-    url = "https://api.sensorguard.systems/api/sensor"
+    url = f"{API_BASE_URL}/sensor"
 
     payload = {
         "name": id,

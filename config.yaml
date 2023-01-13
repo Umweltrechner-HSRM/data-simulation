@@ -7,7 +7,9 @@ aqicn_key: 'e6e52e8fc683d9fcc03235abe9db9d8bc101230b'
 backend:
   username: 'user'
   password: 'user'
-  keycloak_url: 'https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token' 
+  keycloak_url: 'https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token'
+  api_base_url: 'https://api.sensorguard.systems/api'
+  api_ws_url: 'wss://api.sensorguard.systems/api/looping'
   send_response_path: '/app/'
 
 
@@ -46,11 +48,11 @@ sensor_details:
     unit: '°C'
     description: 'Sensor gibt Informationen über die Temperatur'
   p:
-    name: 'pressure_luftdruck' 
+    name: 'pressure_luftdruck'
     unit: 'hPa'
     description: 'Sensor gibt Informationen über den Luftdruck'
   h:
-    name: 'humidity_Feuchtigkeit'  
+    name: 'humidity_Feuchtigkeit'
     unit: '%'
     description: 'Sensor gibt Informationen über die Luftfeuchtigkeit'
   w:
@@ -69,24 +71,24 @@ sensor_details:
     name: 'r_point'
     unit: '%'
     description: 'Kein Plan was r für ein wert sein soll'
-  d: 
+  d:
     name: 'd_point'
     unit: '%'
     description: 'Kein Plan was d für ein wert sein soll'
-  
+
 
 #Active Sensoren
 aktive_sensoren:
-  configured_citys: False
+  configured_citys: True
   heger_spezial: True
-  random_citys: False
+  random_citys: True
 
 #Konfiguration der Heger Spezial Funktion
-heger_spezial:         #Ein Wert wie _TT_TT
+heger_spezial: #Ein Wert wie _TT_TT
   id: HegerSpezial1
   sensor_art: heger_spezial_sensor
   city: imagination_island
-  taktung: 5  
+  taktung: 5
   max_value: 1
   min_value: -1
 #Konfiguration der zufälligen Städte mit ihren Sensoren
@@ -99,49 +101,49 @@ random_citys_sensors:
 #Konfiguratione von Sensoren, bezogen auf eine Stadt
 city_configuration:
   - Wiesbaden:
-    - sensor: pm25                 # lungengängiger_feinstaub
-      taktung: 1          # Wiederholungsrate in s
-      seed: 0             # Zu Testzwecken es kann sein, dass der Wert über mehrere Stunden gleich bleibt. So wir ncoh ein Random wert in der Range vom seed dazuaddiert auf den echten Wert addiert, damit man Veränderungen sieht (seed = 0 -> kein seed)
-    - sensor: pm10                 # einatembarer_feinstaub
-      taktung: 1
-      seed: 0
-    - sensor: o3                   #ozon
-      taktung: 2
-      seed: 0
-    - sensor: no2                  #stickstoffdioxid
-      taktung: 3
-      seed: 0
-    - sensor: so2                  #schwefeldioxid     
-      taktung: 4
-      seed: 0
-    - sensor: co                   #kohlenmonoxid     
-      taktung: 5
-      seed: 0
-    - sensor: t                    #temperatur
-      taktung: 6
-      seed: 0
-    - sensor: p                    #pressure Luftdruck     
-      taktung: 7
-      seed: 0
-    - sensor: h                    #humidity / Feuchtigkeit     
-      taktung: 8
-      seed: 0
-    - sensor: w                    #wind
-      taktung: 9
-      seed: 0
+      - sensor: pm25                 # lungengängiger_feinstaub
+        taktung: 1          # Wiederholungsrate in s
+        seed: 0             # Zu Testzwecken es kann sein, dass der Wert über mehrere Stunden gleich bleibt. So wir ncoh ein Random wert in der Range vom seed dazuaddiert auf den echten Wert addiert, damit man Veränderungen sieht (seed = 0 -> kein seed)
+      - sensor: pm10                 # einatembarer_feinstaub
+        taktung: 1
+        seed: 0
+      - sensor: o3                   #ozon
+        taktung: 2
+        seed: 0
+      - sensor: no2                  #stickstoffdioxid
+        taktung: 3
+        seed: 0
+      - sensor: so2                  #schwefeldioxid
+        taktung: 4
+        seed: 0
+      - sensor: co                   #kohlenmonoxid
+        taktung: 5
+        seed: 0
+      - sensor: t                    #temperatur
+        taktung: 6
+        seed: 0
+      - sensor: p                    #pressure Luftdruck
+        taktung: 7
+        seed: 0
+      - sensor: h                    #humidity / Feuchtigkeit
+        taktung: 8
+        seed: 0
+      - sensor: w                    #wind
+        taktung: 9
+        seed: 0
   - Berlin:
-    - sensor: t                    #temperatur
-      taktung: 1
-      seed: 0
-    - sensor: p                    #pressure Luftdruck     
-      taktung: 1
-      seed: 0
-    - sensor: h                    #humidity / Feuchtigkeit     
-      taktung: 1
-      seed: 0
-    - sensor: w                    #wind
-      taktung: 1
-      seed: 0
+      - sensor: t                    #temperatur
+        taktung: 1
+        seed: 0
+      - sensor: p                    #pressure Luftdruck
+        taktung: 1
+        seed: 0
+      - sensor: h                    #humidity / Feuchtigkeit
+        taktung: 1
+        seed: 0
+      - sensor: w                    #wind
+        taktung: 1
+        seed: 0
 
 random_citys:
   - 'Berlin'
