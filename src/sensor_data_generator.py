@@ -420,8 +420,7 @@ if __name__ == "__main__":
             time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
 
     #Solange der Websocket verbunden ist, werden Daten gesendet
-    while True:
-        print("LOOP")
+    while True:        
         # Websocketverbindung ist abgebrochen
         if client.connected == False:
             # Versuchen erneut zu verbinden

@@ -80,7 +80,7 @@ sensor_details:
 #Active Sensoren
 aktive_sensoren:
   configured_citys: True
-  heger_spezial: True
+  heger_spezial: False
   random_citys: True
 
 #Konfiguration der Heger Spezial Funktion
