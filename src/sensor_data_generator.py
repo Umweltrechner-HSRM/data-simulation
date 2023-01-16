@@ -12,7 +12,8 @@ from datetime import datetime
 import os
 import logging
 
-# Globale Variablen anlegen
+
+
 
 #Directory paths ermitteln
 src_path = str(os.path.dirname(__file__))
@@ -20,8 +21,25 @@ buffer_path = str(os.path.join(src_path, '../buffer'))
 config_path = str(os.path.join(src_path, '../config.yaml'))
 log_path = str(os.path.join(src_path, '../logs'))
 
+
 #config einlesen
 config = yaml.safe_load(open(config_path, encoding='utf-8'))
+
+
+# Logging
+log_level = config['log_level']
+logging.basicConfig(
+    filename=os.path.join(log_path, 'data-simulation.log'),
+    filemode='w',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%d.%m.%y %H:%M:%S',
+    encoding='utf-8',
+    level=log_level
+)
+logging.info("AKTIVIERTE SENSOREN STARTEN1")    
+print("First log is da")
+
+
 API_BASE_URL = config['backend']['api_base_url']
 
 #Mit Websocket verbinden
@@ -32,10 +50,13 @@ client = Client(config['backend']['api_ws_url'])
 client.connect()
 
 #Logger anlegen
-log_level = config['log_level']
-logging.basicConfig(handlers=[logging.FileHandler(os.path.join(log_path, 'data-simulation.log'), 'w', 'utf-8')], level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# log_level = config['log_level']
+#logging.basicConfig(handlers=[logging.FileHandler('./data-simulation70.log', 'w', 'utf-8')], level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+
 
 #Hilfsfunktionen
+
 def printTable(myDict, colList=None):
    """ Pretty print a list of dictionaries (myDict) as a dynamically sized table.
    If column names (colList) aren't specified, they will show in random order.
@@ -137,6 +158,7 @@ def send_response_to_backend(response):
     # Daten an das Backend senden
     client.send(destination=dest, body=json.dumps(response))
     print("Response:", response)
+    logging.info(f"Folgende Response wird geschickt: {response}")
     return
 
 def get_all_citys_from_backend():
@@ -370,7 +392,7 @@ def random_city_sensor(city, taktung, lifetime):
 
 if __name__ == "__main__":
     logging.info("...")
-    logging.info("AKTIVIERTE SENSOREN STARTEN")
+    logging.info("AKTIVIERTE SENSOREN STARTEN")    
     #Starte konfigurierte citys
     if config['aktive_sensoren']['configured_citys']:
         for city in config['city_configuration']:
