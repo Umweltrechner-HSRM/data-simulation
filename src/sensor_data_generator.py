@@ -46,17 +46,18 @@ API_BASE_URL = config['backend']['api_base_url']
 # open transport
 client = Client(config['backend']['api_ws_url'])
 
+#setcallback function
+def ws_error_callback():
+    #Es kann sich nicht mehr mit dem Websocket verbunden werden -> Script stoppen
+    logging.critical("Fehler beim Websocket -> Abbruch")
+    sys.exit(0)
+
+client.errorCallback = ws_error_callback
+
 # connect to the endpoint
 client.connect()
 
-#Logger anlegen
-# log_level = config['log_level']
-#logging.basicConfig(handlers=[logging.FileHandler('./data-simulation70.log', 'w', 'utf-8')], level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-
-
 #Hilfsfunktionen
-
 def printTable(myDict, colList=None):
    """ Pretty print a list of dictionaries (myDict) as a dynamically sized table.
    If column names (colList) aren't specified, they will show in random order.
@@ -411,13 +412,22 @@ if __name__ == "__main__":
     # Random city_sensoren
     if config['aktive_sensoren']['random_citys']:
         random_citys = get_number_of_valid_unused_citys(config['random_citys'], config['random_citys_sensors']['anzahl_unterschiedlicher_citys'] )
-        print("Random_citys:list: ", random_citys)
-        while True:
-            for city in  random_citys:
-                random_city_thread = Thread(target=random_city_sensor, args=(city, config['random_citys_sensors']['taktung'], config['random_citys_sensors']['lifetime_pro_city']), daemon=True)
-                random_city_thread.start()
-                logging.info(f"Starte zufällige Stadt: ARGS: - Stadt: {city} - Taktung: {config['random_citys_sensors']['taktung']} - City-Lifetime: {config['random_citys_sensors']['lifetime_pro_city']}")
-                time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
+        print("Random_citys:list: ", random_citys)        
+        for city in  random_citys:
+            random_city_thread = Thread(target=random_city_sensor, args=(city, config['random_citys_sensors']['taktung'], config['random_citys_sensors']['lifetime_pro_city']), daemon=True)
+            random_city_thread.start()
+            logging.info(f"Starte zufällige Stadt: ARGS: - Stadt: {city} - Taktung: {config['random_citys_sensors']['taktung']} - City-Lifetime: {config['random_citys_sensors']['lifetime_pro_city']}")
+            time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
 
+    #Solange der Websocket verbunden ist, werden Daten gesendet
     while True:
-        time.sleep(1000000)
+        print("LOOP")
+        # Websocketverbindung ist abgebrochen
+        if client.connected == False:
+            # Versuchen erneut zu verbinden
+            client.connect()
+            if client.connected == False:
+                #Es kann sich nicht mehr mit dem Websocket verbunden werden -> Script stoppen
+                logging.critical("Keine Verbindung zum Websocket möglich -> Abbruch")
+                sys.exit(0)
+        time.sleep(1)
