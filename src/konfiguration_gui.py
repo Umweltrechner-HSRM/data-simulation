@@ -318,9 +318,12 @@ while True:
 
     if event == '-TIMEOUT-':
         # Einlesen des Logfiles und updaten
-        file_object = open(os.path.join(log_path, 'data-simulation.log'), 'r', encoding='utf-8')
-        log = file_object.read()[-2000:]
-        file_object.close()
+        try:
+            file_object = open(os.path.join(log_path, 'data-simulation.log'), 'r', encoding='utf-8')
+            log = file_object.read()[-2000:]
+            file_object.close()
+        except IOError:
+            continue
         
         if log != last_logs and programm_running == True:
             window['-DATENSIMULATION_LOGS-'].update(log)
