@@ -2,19 +2,15 @@ import PySimpleGUI as sg
 import os
 import yaml
 import subprocess as sp
-import time
-import sys
 import json
 import ast
 
-#Directory paths ermitteln
+# Directory paths ermitteln
 src_path = str(os.path.dirname(__file__))
 config_path = str(os.path.join(src_path, '../config.yaml'))
 log_path = str(os.path.join(src_path, '../logs'))
 
-#config einlesen
-#config = yaml.safe_load(open(config_path, encoding='utf-8'))
-
+# config einlesen
 with open(config_path, 'r', encoding='utf-8') as file:
     # Load the YAML data into a Python dictionary
     config = yaml.load(file, Loader=yaml.FullLoader)
@@ -166,10 +162,10 @@ def save_yaml():
         yaml.dump(config, file, default_flow_style=False, encoding="utf-8", allow_unicode=True, Dumper=yaml.SafeDumper)
 
 def yaml_to_json(yaml_element):
-    return json.dumps(yaml_element, indent=2)  
+    print("YAML: ", yaml_element)
+    return json.dumps(yaml_element, indent=2, ensure_ascii=False)  
 
-def json_to_yaml(json_string):
-    print("json to yaml", json_string)
+def json_to_yaml(json_string):    
     return json.loads(json_string)  
 
 def activate_column(column_name):
@@ -199,6 +195,27 @@ def load_zufällige_städte():
     window["-ZUFALL-LEBENSZEIT-"].update(value=config['random_citys_sensors']['lifetime_pro_city'])
     window["-ZUFÄLLIGE_STÄDTE_MULTILINE-"].update(value=config['random_citys'])
 
+def load_heger_sensor():
+    window["-HEGER_SENDER_STATUS2-"].update(value=config['aktive_sensoren']['heger_spezial'])
+    window["-HEGER_SENSORNAME-"].update(value=config['heger_spezial']['id'])
+    window["-HEGER_SENSORART-"].update(value=config['heger_spezial']['sensor_art'])
+    window["-HEGER_STADT-"].update(value=config['heger_spezial']['city'])
+    window["-HEGER-TAKTUNG-"].update(value=config['heger_spezial']['taktung'])
+    window["-HEGER_MAX_WERT-"].update(value=config['heger_spezial']['max_value'])
+    window["-HEGER_MIN_WERT-"].update(value=config['heger_spezial']['min_value'])
+
+def load_einstellungen():    
+    window["-AQICN_API_KEY-"].update(value=config['aqicn_key'])
+    window["-BACKEND_USERNAME-"].update(value=config['backend']['username'])
+    window["-BACKEND_PASSWORT-"].update(value=config['backend']['password'])
+    window["-BACKEND_KEYCLOAK-"].update(value=config['backend']['keycloak_url'])
+    window["-BACKEND_API_BASE-"].update(value=config['backend']['api_base_url'])
+    window["-BACKEND_API_WS-"].update(value=config['backend']['api_ws_url'])
+    window["-BACKEND_SEND_RESPONSE_PATH-"].update(value=config['backend']['send_response_path'])
+    window["-INFORMATION_MAP-"].update(value=yaml_to_json(config['sensor_details']))
+    
+
+
 # Load first data
 load_control_panel()
 # Variables
@@ -221,18 +238,20 @@ while True:
         load_control_panel()
 
     if event == "-STADT-SENSOREN-":
-        activate_column("-DYNAMIC_COLUMN2-")
         load_stadt_sensoren() 
+        activate_column("-DYNAMIC_COLUMN2-")
 
     if event == "-ZUFÄLLIGE_STÄDTE-":
-        load_zufällige_städte()
         activate_column("-DYNAMIC_COLUMN3-") 
+        load_zufällige_städte()
 
     if event == "-HEGER_SENSOR-":
-        activate_column("-DYNAMIC_COLUMN4-") 
+        activate_column("-DYNAMIC_COLUMN4-")
+        load_heger_sensor()
 
     if event == "-EINSTELLUNGEN-":
         activate_column("-DYNAMIC_COLUMN5-") 
+        load_einstellungen()
     
     # Control Panel
     if event == "-SPEICHERN_CONTROL_PANEL-":
@@ -277,7 +296,29 @@ while True:
         config['random_citys_sensors']['lifetime_pro_city'] = values["-ZUFALL-LEBENSZEIT-"]
         config['random_citys'] = ast.literal_eval(values['-ZUFÄLLIGE_STÄDTE_MULTILINE-'])
         save_yaml()
-        load_control_panel()        
+        load_control_panel()
 
+    if event == "-SPEICHERN_HEGER_SENSOR-":
+        config['aktive_sensoren']['heger_spezial'] = values["-HEGER_SENDER_STATUS2-"]
+        config['heger_spezial']['id'] = values["-HEGER_SENSORNAME-"]
+        config['heger_spezial']['sensor_art'] = values["-HEGER_SENSORART-"]
+        config['heger_spezial']['city'] = values["-HEGER_STADT-"]
+        config['heger_spezial']['taktung'] = values["-HEGER-TAKTUNG-"]
+        config['heger_spezial']['max_value'] = int(values["-HEGER_MAX_WERT-"])
+        config['heger_spezial']['min_value'] = int(values["-HEGER_MIN_WERT-"])
+        save_yaml()
+        load_heger_sensor()
+
+    if event == "-SPEICHERN_EINSTELLUNGEN-":
+        config['aqicn_key'] = values['-AQICN_API_KEY-']
+        config['backend']['username'] = values['-BACKEND_USERNAME-']
+        config['backend']['password'] = values['-BACKEND_PASSWORT-']
+        config['backend']['keycloak_url'] = values['-BACKEND_KEYCLOAK-']
+        config['backend']['api_base_url'] = values['-BACKEND_API_BASE-']
+        config['backend']['api_ws_url'] = values['-BACKEND_API_WS-']
+        config['backend']['send_response_path'] = values['-BACKEND_SEND_RESPONSE_PATH-']
+        config['sensor_details'] = json_to_yaml(values['-INFORMATION_MAP-'])
+        save_yaml()
+        load_heger_sensor()
 
 window.close()
