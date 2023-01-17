@@ -257,6 +257,7 @@ def load_einstellungen():
 # HILFSVARIABLEN
 # speichert den Programm status
 programm_running = False
+programm_running_first_time = True
 # speichert den Prozess
 process = ''
 # speichert die letzten logs
