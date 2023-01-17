@@ -181,7 +181,6 @@ def yaml_to_json(yaml_element):
     """
     Hier konvertiert man yaml zu Json, da nur dieses schön in der GUI anzeigen kann
     """
-    print('YAML: ', yaml_element)
     return json.dumps(yaml_element, indent=2, ensure_ascii=False)  
 
 def json_to_yaml(json_string):
