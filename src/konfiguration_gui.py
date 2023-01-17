@@ -163,7 +163,6 @@ layout = [
      sg.Column(layout = einstellungen_column, scrollable=True, vertical_scroll_only=True, visible=False, key='-DYNAMIC_COLUMN5-'),
     ]
 ]
-dynamic_layout_keys = ['-DYNAMIC_COLUMN1-', '-DYNAMIC_COLUMN2-', '-DYNAMIC_COLUMN3-', '-DYNAMIC_COLUMN4-', '-DYNAMIC_COLUMN5-']
 window = sg.Window('Data-simulation', layout, finalize=True)
 
 
@@ -262,6 +261,8 @@ programm_running = False
 process = ''
 # speichert die letzten logs
 last_logs = ''
+# liste vona allen Columns
+dynamic_layout_keys = ['-DYNAMIC_COLUMN1-', '-DYNAMIC_COLUMN2-', '-DYNAMIC_COLUMN3-', '-DYNAMIC_COLUMN4-', '-DYNAMIC_COLUMN5-']
 
 # VORABFUNKTIONEN
 # Erste Column laden
