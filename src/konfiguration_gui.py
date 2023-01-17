@@ -20,7 +20,6 @@ with open(config_path, 'r', encoding='utf-8') as file:
 sg.theme('DarkTeal9')
 
 
-
 # SPALTEN-LAYOUT
 # statisches Menü
 menue_column = [
@@ -257,23 +256,27 @@ def load_einstellungen():
     
 
 
-# Load first data
-load_control_panel()
-# Variables
-# Läuft das Programm und SubProzess
+# HILFSVARIABLEN
+# speichert den Programm status
 programm_running = False
+# speichert den Prozess
 process = ''
-# logs
+# speichert die letzten logs
 last_logs = ''
 
-# Run the Event Loop
+# VORABFUNKTIONEN
+# Erste Column laden
+load_control_panel()
+
+# EVENT LOOP
 while True:    
     event, values = window.read(timeout=100, timeout_key='-TIMEOUT-')        
 
+    # CLOSE UI
     if event == sg.WIN_CLOSED:        
         break
 
-    #Menü
+    # MENÜ
     if event == '-CONTROL_PANEL-':
         activate_column('-DYNAMIC_COLUMN1-') 
         load_control_panel()
@@ -294,7 +297,7 @@ while True:
         activate_column('-DYNAMIC_COLUMN5-') 
         load_einstellungen()
     
-    # Control Panel
+    # CONTROL PANEL SPEICHERN UND FUNKTIONALITÄT
     if event == '-SPEICHERN_CONTROL_PANEL-':
         config['aktive_sensoren']['configured_citys'] = values['-STADT-SENSOREN_STATUS-']
         config['aktive_sensoren']['random_citys'] = values['-ZUFÄLLIGE_STÄDTE_STATUS-']
@@ -303,6 +306,7 @@ while True:
         load_control_panel()
     
     if event == '-DATENSIMULATION_START_STOP-':
+        # Startet und stoppt das Programm
         if programm_running == False:
             process = sp.Popen(['python', os.path.join(src_path, 'sensor_data_generator.py') ])
             programm_running = True
@@ -313,7 +317,7 @@ while True:
             window['-DATENSIMULATION_START_STOP-'].update('Datensimulation starten', button_color='green')
 
     if event == '-TIMEOUT-':
-        # Einlesen des logfiles
+        # Einlesen des Logfiles und updaten
         file_object = open(os.path.join(log_path, 'data-simulation.log'), 'r', encoding='utf-8')
         log = file_object.read()[-2000:]
         file_object.close()
@@ -322,13 +326,14 @@ while True:
             window['-DATENSIMULATION_LOGS-'].update(log)
             last_logs = log
 
-    # Stadt Koniguration
+    # STADT-SENSOR SPEICHERN
     if event == '-SPEICHERN_STADT-SENSOREN-':
         config['aktive_sensoren']['configured_citys'] = values['-STADT-SENSOREN_STATUS2-']
         config['city_configuration'] = json_to_yaml(values['-STADT_SENSOREN_MULTILINE-'])
         save_yaml()
         load_control_panel()        
 
+    # ZUFÄLLIGE STÄDTE SPEICHERN
     if event == '-SPEICHERN_ZUFÄLLIGE_STÄDTE-':
         config['aktive_sensoren']['random_citys'] = values['-ZUFÄLLIGE_STÄDTE_STATUS2-']
         config['random_citys_sensors']['taktung'] = values['-ZUFALL-TAKTUNG-']
@@ -339,6 +344,7 @@ while True:
         save_yaml()
         load_control_panel()
 
+    # HEGER SPEZIAL SPEICHERN
     if event == '-SPEICHERN_HEGER_SENSOR-':
         config['aktive_sensoren']['heger_spezial'] = values['-HEGER_SENDER_STATUS2-']
         config['heger_spezial']['id'] = values['-HEGER_SENSORNAME-']
@@ -350,6 +356,7 @@ while True:
         save_yaml()
         load_heger_sensor()
 
+    # EINSTELLUNGEN SPEICHERN
     if event == '-SPEICHERN_EINSTELLUNGEN-':
         config['aqicn_key'] = values['-AQICN_API_KEY-']
         config['backend']['username'] = values['-BACKEND_USERNAME-']
