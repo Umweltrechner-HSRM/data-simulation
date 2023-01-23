@@ -40,9 +40,9 @@ logging.info("AKTIVIERTE SENSOREN STARTEN1")
 print("First log is da")
 
 
+#Mit Websocket verbinden
 API_BASE_URL = config['backend']['api_base_url']
 
-#Mit Websocket verbinden
 # open transport
 client = Client(config['backend']['api_ws_url'])
 
