@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "./src/sensor_data_generator.py"]
+CMD ["python", "./src/main.py"]
