@@ -3,7 +3,7 @@ import os
 import logging
 import yaml
 import requests
-import singelton
+import singleton
 import json
 import random
 import aqicn_api
@@ -20,8 +20,8 @@ config = yaml.safe_load(open(config_path, encoding='utf-8'))
 # Api Base URL festlegen
 API_BASE_URL = config['backend']['api_base_url']
 
-# Singelton Klasse für das Backend
-class BackendSingleton(metaclass=singelton.SingletonMeta):
+# singleton Klasse für das Backend
+class BackendSingleton(metaclass=singleton.SingletonMeta):
     token = None
     client = None
 
