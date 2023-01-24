@@ -23,7 +23,7 @@ def get_sensor_from_city(sensor, taktung, seed, city):
     if sensor not in aqicn_api.get_station_sensors(umweltstation_id):
         raise Exception(f"ERROR: {umweltstation_id} Zu der Stadt: {city}, gibt es den Sensor: {sensor} nicht")
     #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
-    id = helper.generate_seonsor_name(umweltstation_id, sensor)
+    id = helper.generate_seonsor_name(umweltstation_id, sensor, city)
     if id not in backend.get_all_sensors_from_backend():
         #Registriere Sensor in der Datenbank
         backend.register_sensor(id, sensor, city)
@@ -84,7 +84,7 @@ def random_city_sensor(city, taktung, lifetime):
         data = aqicn_api.get_station_data(umweltstation_id)
         for sensor in list(data['iaqi'].keys()):
             #Überprüfen, ob der Sensor bereits in der Datenbank existiert, wenn nicht muss err angelegt werden
-            id = helper.generate_seonsor_name(umweltstation_id, sensor)
+            id = helper.generate_seonsor_name(umweltstation_id, sensor, city)
             if id not in backend.get_all_sensors_from_backend():
                 #Registriere Sensor in der Datenbank
                 backend.register_sensor(id, sensor, city)

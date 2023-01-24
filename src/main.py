@@ -16,7 +16,6 @@ config = helper.get_config()
 backend = backend_api.BackendSingleton()
 client = backend.client
 
-
 def starte_stadt_sensoren():
     #Starte konfigurierte citys
     for city in config['city_configuration']:
@@ -45,7 +44,7 @@ def starte_heger_spezial():
 
 def starte_sensoren():
     """
-    Hier werden die Sensorthreads gestartet
+    Hier werden die aktiven Sensorthreads gestartet
     """
     logging.info("AKTIVIERTE SENSOREN STARTEN")    
     if config['aktive_sensoren']['configured_citys']:

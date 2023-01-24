@@ -58,11 +58,12 @@ def convert_time_from_iso8601_to_unix_milli_timestamp(iso_time):
     unix_timestamp = int(time_obj.timestamp() * 1000)
     return unix_timestamp
 
-def generate_seonsor_name(umweltstation_id, sensor):
+def generate_seonsor_name(umweltstation_id, sensor, city):
     """
     Aus umweltstation_id und sensor Sensornamen generieren
     """
-    return f'sensor_{umweltstation_id}_{sensor}'
+    config = get_config()
+    return f'{city}_{config["sensor_details"][sensor]["name"]}_{umweltstation_id}'
 
 def generate_response(id, time, value, city):
     """

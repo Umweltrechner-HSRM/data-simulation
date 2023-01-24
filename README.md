@@ -103,6 +103,22 @@ random_sensors:
 - ERROR: Diese Ebene wird verwendet, um ein ernstes Problem anzuzeigen, das aufgetreten ist. Dies könnte Situationen umfassen, in denen die Anwendung eine bestimmte Operation nicht ausführen kann oder in denen eine Ausnahme ausgelöst wurde.
 - CRITICAL: Diese Ebene wird verwendet, um ein kritischen Problem anzuzeigen, das aufgetreten ist. Dies könnte Situationen umfassen, in denen die Anwendung nicht mehr verwendbar ist oder in denen Daten verloren gegangen sind.
 
+# BlackBox Tests
+
+
+WARNING geben
+speichern des aktuellen config files
+config file überschreiben
+
+sensor stadt -> Start, senden
+
+heger spezial -> start, senden
+
+zufall -> registrieren, senden
+
+altes config file setzen
+
+
 # Fehler die abzufangen sind
 - Sensoren die es nicht gibt
 - Städte, die es nicht gibt
