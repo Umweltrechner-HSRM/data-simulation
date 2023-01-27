@@ -327,7 +327,7 @@ def get_sensor_from_city(sensor, taktung, seed, city):
         #timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
         timestamp = time.time() * 1000
         #Response vorbereiten
-        response = generate_response(id, timestamp,  data['iaqi'][sensor]['v'], city)
+        response = generate_response(id, timestamp,  data['iaqi'][sensor]['v'] + config['city_configuration'][city][seed], city)
         #Senden
         send_response_to_backend(response)
         with open(buffer_path+f"/{response['id']}.json", 'w', encoding="utf-8") as f:

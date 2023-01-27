@@ -105,6 +105,16 @@ random_sensors:
 
 # BlackBox Tests
 
+exception handling bei request
+
+- Namen ändern
+- läuft main?
+- neue config updaten (neue namen)
+- zeit nehmen, welche ich verschicke
+- exception handling bei conn
+- wenn ich sensoren konfigurire die es gar nicht gibt, bei stadt sensor
+
+sensor liste nach zeit nach formeln dann nach zeit sortieren
 
 WARNING geben
 speichern des aktuellen config files
@@ -125,3 +135,18 @@ altes config file setzen
 - stadt gibt es nicht aber sensor
 - Testen
 - logging
+
+# Präsi
+
+1. (Dashboard für jede Stadt, Kein Überflüssigen Sensoren)
+
+2. formel einfügen:
+  if Uhrzeit >= 35
+  feinstaub_durchschnitt = (Wiesbaden + Mainz) / 2
+
+3. Neues Dashboard "Feinstaub Umgebung"
+
+4. Email Limit setzen
+
+5. Email anzeigen
+

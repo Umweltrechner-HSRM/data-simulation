@@ -1,4 +1,5 @@
 import time
+import random
 import helper
 import aqicn_api
 import backend_api
@@ -35,9 +36,11 @@ def get_sensor_from_city(sensor, taktung, seed, city):
         data = aqicn_api.get_station_data(umweltstation_id)
         # Zeit umrechnern
         #timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
-        timestamp = time.time() * 1000
-        #Response vorbereiten
-        response = helper.generate_response(id, timestamp,  data['iaqi'][sensor]['v'], city)
+        timestamp = time.time() * 1000      
+        print("Random Range:", random.uniform(-seed, seed)) 
+        data_value = float(data['iaqi'][sensor]['v']) + random.uniform(-seed, seed)
+        #Response vorbereiten        
+        response = helper.generate_response(id, timestamp, data_value, city)
         #Senden
         backend.send_response_to_backend(response)
         #Logging / Ausgabe

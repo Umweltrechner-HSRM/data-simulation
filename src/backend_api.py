@@ -153,7 +153,7 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
         dest = f"{send_response_path}{response['id']}"
         # Daten an das Backend senden
         self.client.send(destination=dest, body=json.dumps(response))
-        #print("Response!!!!!:", response)
+        #Logging
         logging.info(f"Folgende Response wird geschickt: {response}")
         return
 
