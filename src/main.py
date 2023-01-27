@@ -47,6 +47,7 @@ def starte_sensoren():
     Hier werden die aktiven Sensorthreads gestartet
     """
     logging.info("AKTIVIERTE SENSOREN STARTEN")    
+    print("Akitvierte Sensoren gestartet")    
     if config['aktive_sensoren']['configured_citys']:
         starte_stadt_sensoren()        
 
@@ -55,6 +56,7 @@ def starte_sensoren():
 
     if config['aktive_sensoren']['random_citys']:
         starte_random_sensoren()
+
 
 if __name__ == "__main__":
     starte_sensoren()

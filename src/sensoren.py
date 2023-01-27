@@ -28,8 +28,6 @@ def get_sensor_from_city(sensor, taktung, seed, city):
     if id not in backend.get_all_sensors_from_backend():
         #Registriere Sensor in der Datenbank
         backend.register_sensor(id, sensor, city)
-    #Sagen, dass die Stadt beginnt zu senden
-    print("City: ", city, "mit Sensor", sensor, "beginnt zu senden")
 
     while True:
         #Daten der Umweltstation erfassen
@@ -37,7 +35,6 @@ def get_sensor_from_city(sensor, taktung, seed, city):
         # Zeit umrechnern
         #timestamp = convert_time_from_iso8601_to_unix_milli_timestamp(data['time']['iso'])
         timestamp = time.time() * 1000      
-        print("Random Range:", random.uniform(-seed, seed)) 
         data_value = float(data['iaqi'][sensor]['v']) + random.uniform(-seed, seed)
         #Response vorbereiten        
         response = helper.generate_response(id, timestamp, data_value, city)

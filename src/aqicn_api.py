@@ -1,5 +1,6 @@
 import requests
 import helper
+import logging
 config = helper.get_config()
 
 #AQICN-API Funktionen
@@ -48,6 +49,7 @@ def get_biggest_station_of_city(cityname: str) -> str or None:
             biggest_station_with_sensor['anzahl_sensors'] = data['iaqi']
 
     #Rückgabe
+    logging.info(f"Biggest station in: {cityname} - {station_id}")
     return biggest_station_with_sensor['uid']
 
 
