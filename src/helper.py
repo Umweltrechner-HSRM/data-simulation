@@ -32,7 +32,7 @@ def setup_login():
         level=log_level,
         force=True
     )
-    logging.info("Login wurde aufgesetzt")
+    logging.info("Logging wurde aufgesetzt")
 
 def printTable(myDict, colList=None):
    """ Pretty print a list of dictionaries (myDict) as a dynamically sized table.

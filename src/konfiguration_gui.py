@@ -308,7 +308,7 @@ while True:
     if event == '-DATENSIMULATION_START_STOP-':
         # Startet und stoppt das Programm
         if programm_running == False:
-            process = sp.Popen(['python', os.path.join(src_path, 'sensor_data_generator.py') ])
+            process = sp.Popen(['python', os.path.join(src_path, 'main.py') ])
             programm_running = True
             window['-DATENSIMULATION_START_STOP-'].update('Datensimulation stoppen', button_color='red')
         else:            
