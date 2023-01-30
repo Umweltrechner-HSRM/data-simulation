@@ -37,7 +37,7 @@ def get_biggest_station_of_city(cityname: str) -> str or None:
 
     #Die Station ID's sortieren, falls meherere Stationen die gleiche Anzahl an Sensoren haben, wird aber die mit der kleinsten UID 
     all_station_ids = get_all_stations_from_city(cityname)
-    all_station_ids_sorted = all_station_ids.sort()
+    all_station_ids.sort()    
     for station_id in all_station_ids:
         #Daten zur Station holen
         data = get_station_data(station_id)
