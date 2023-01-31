@@ -1,0 +1,324 @@
+aktive_sensoren:
+  configured_citys: true
+  heger_spezial: false
+  random_citys: false
+aqicn_key: e6e52e8fc683d9fcc03235abe9db9d8bc101230b
+backend:
+  api_base_url: https://api.sensorguard.systems/api
+  api_ws_url: wss://api.sensorguard.systems/api/looping
+  keycloak_url: https://keycloak.sensorguard.systems/auth/realms/Umweltrechner-keycloak/protocol/openid-connect/token
+  password: user
+  send_response_path: /app/
+  username: user
+city_configuration:
+- Wiesbaden:
+  - seed: 1
+    sensor: pm10
+    taktung: 2
+  - seed: 1
+    sensor: t
+    taktung: 2
+- Mainz:
+  - seed: 1
+    sensor: pm10
+    taktung: 2
+  - seed: 1
+    sensor: t
+    taktung: 2
+- Frankfurt:
+  - seed: 1
+    sensor: pm10
+    taktung: 5
+  - seed: 1
+    sensor: t
+    taktung: 5
+heger_spezial:
+  city: Schierstein
+  id: HegerSpezial1
+  max_value: 1
+  min_value: -1
+  sensor_art: heger_spezial_sensor
+  taktung: 7
+log_level: INFO
+random_citys:
+- Berlin
+- Hamburg
+- Munich
+- Cologne
+- Frankfurt
+- Bremen
+- Düsseldorf
+- Stuttgart
+- Leipzig
+- Dortmund
+- Essen
+- Dresden
+- Hannover
+- Nuremberg
+- Duisburg
+- Bochum
+- Wuppertal
+- Bielefeld
+- Bonn
+- Münster
+- Karlsruhe
+- Mannheim
+- Augsburg
+- Kassel
+- Wiesbaden
+- Mönchengladbach
+- Gelsenkirchen
+- Braunschweig
+- Aachen
+- Kiel
+- Chemnitz
+- Freiburg im Breisgau
+- Krefeld
+- Mainz
+- Lübeck
+- Oberhausen
+- Hagen
+- Potsdam
+- Ludwigshafen
+- Mülheim
+- Oldenburg
+- Osnabrück
+- Leverkusen
+- Heidelberg
+- Solingen
+- Darmstadt
+- Herne
+- Neuss
+- Ingolstadt
+- Würzburg
+- Fürth
+- Ulm
+- Heilbronn
+- Pforzheim
+- Wolfsburg
+- Göttingen
+- Bottrop
+- Reutlingen
+- Koblenz
+- Recklinghausen
+- Trier
+- Salzgitter
+- Cottbus
+- Kaiserslautern
+- Hanau
+- Gera
+- Ludwigsburg
+- Düren
+- Tübingen
+- Flensburg
+- Zwickau
+- Gießen
+- Ratingen
+- Lünen
+- Villingen-Schwenningen
+- Konstanz
+- Worms
+- Norderstedt
+- Bamberg
+- Marburg
+- Gladbeck
+- Troisdorf
+- Bayreuth
+- Castrop-Rauxel
+- Lüdenscheid
+- Landshut
+- Brandenburg
+- Celle
+- Kempten
+- Fulda
+- Aalen
+- Dinslaken
+- Rüsselsheim
+- Plauen
+- Neuwied
+- Herten
+- Bergheim
+- Friedrichshafen
+- Wesel
+- Hürth
+- Neu-Ulm
+- Unna
+- Frankfurt (Oder)
+- Görlitz
+- Langenhagen
+- Meerbusch
+- Waiblingen
+- Baden-Baden
+- Hattingen
+- Pulheim
+- Schweinfurt
+- Neustadt
+- Wetzlar
+- Frechen
+- Passau
+- Goslar
+- Rastatt
+- Lörrach
+- Bergkamen
+- Soest
+- Schwerte
+- Hof
+- Filderstadt
+- Fellbach
+- Brühl
+- Falkensee
+- Kaarst
+- Bietigheim-Bissingen
+- Kamen
+- Borken
+- Nettetal
+- Aurich
+- Amberg
+- Ansbach
+- Laatzen
+- Coburg
+- Freiberg
+- Schwabach
+- Bensheim
+- Schwäbisch Hall
+- Pirmasens
+- Eberswalde
+- Leinfelden-Echterdingen
+- Neumarkt
+- Hofheim
+- Freital
+- Ettlingen
+- Ostfildern
+- Maintal
+- Würselen
+- Bautzen
+- Niederkassel
+- Neu Isenburg
+- Königs Wusterhausen
+- Wesseling
+- Kehl
+- Limburg
+- Mörfelden-Walldorf
+- Datteln
+- Radebeul
+- Bad Vilbel
+- Kornwestheim
+- Korschenbroich
+- Biberach
+- Lampertheim
+- Altenburg
+- Itzehoe
+- Georgsmarienhütte
+- Herrenberg
+- Oer-Erkenschwick
+- Neuruppin
+- Haan
+- Weil am Rhein
+- Andernach
+- Schwedt (Oder)
+- Friedberg
+- Waltrop
+- Friedberg
+- Landsberg
+- Kelkheim (Taunus)
+- Schwelm
+- Königsbrunn
+- Leichlingen
+- Hattersheim
+- Wetter (Ruhr)
+- Griesheim
+- Leimen
+- Wiesloch
+- Hamminkeln
+- Neckarsulm
+- Heiligenhaus
+- Heppenheim
+- Weiterstadt
+- Kulmbach
+- Teltow
+- Zirndorf
+- Lindau
+- Zittau
+- Pfungstadt
+- Luckenwalde
+- Greiz
+- Holzminden
+- Annaberg-Buchholz
+- Weißenburg
+- Cham
+- Kelheim
+- Neustadt
+- Lüchow
+- Neustadt
+- Offenbach
+- Frankenthal
+- Verden
+- Neustadt
+random_citys_sensors:
+  anzahl_unterschiedlicher_citys: 2
+  lifetime_pro_city: 2
+  taktung: 2
+  zeitlicher_abstand_zwischen_den_starts: 2
+sensor_details:
+  co:
+    description: Sensor gibt Informationen über den Kohlenstoffmonoxidgehalt
+    name: kohlenmonoxid
+    unit: µg/m3
+  d:
+    description: Kein Plan was d für ein wert sein soll
+    name: d_point
+    unit: '%'
+  dew:
+    description: Taupunkt Temperatur, auf die die Luft abgekühlt werden muss, um 100%
+      Luftfeuchtigkeit zu erreichen (dew_point)
+    name: Taupunkt
+    unit: °C
+  h:
+    description: Sensor gibt Informationen über die Luftfeuchtigkeit (humidity)
+    name: Feuchtigkeit
+    unit: '%'
+  heger_spezial_sensor:
+    description: Sensor wechselt in einem gegebenen Intervall zwischen einem gegeben
+      min und max wert
+    name: heger_spezial
+    unit: Takte
+  no2:
+    description: Sensor gibt Informationen über den Stickstoffdioxidgehalt
+    name: stickstoffdioxid
+    unit: µg/m3
+  o3:
+    description: Sensor gibt Informationen über den Ozongehalt
+    name: ozon
+    unit: µg/m3
+  p:
+    description: Sensor gibt Informationen über den Luftdruck (presssure)
+    name: luftdruck
+    unit: hPa
+  pm10:
+    description: Sensor gibt Informationen über den einatembaren Feinstaub
+    name: einatembarer_feinstaub
+    unit: µg/m3
+  pm25:
+    description: Sensor gibt Informationen über den lungengängigen Feinstaub
+    name: lungengängiger_feinstaub
+    unit: µg/m3
+  r:
+    description: Kein Plan was r für ein wert sein soll
+    name: r_point
+    unit: '%'
+  so2:
+    description: Sensor gibt Informationen über den Schwefeldioxidgehalt
+    name: schwefeldioxid
+    unit: µg/m3
+  t:
+    description: Sensor gibt Informationen über die Temperatur
+    name: temperatur
+    unit: °C
+  w:
+    description: Sensor gibt Informationen über die Windstaerke
+    name: wind
+    unit: mph
+  wg:
+    description: Höchste Windgeschwinigkeit am Tag (wind gust)
+    name: Windgeschwinigkeit
+    unit: km/h

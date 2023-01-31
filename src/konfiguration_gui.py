@@ -82,7 +82,7 @@ zufällige_städte_column = [
     [sg.Spin(values=list(range(0, 1000)), initial_value=2, key='-ZUFALL-UNTERSCHIEDLICHE_STÄDTE-')],
     [sg.Text('Abstand zwischen den Starts der Städte: ')],
     [sg.Spin(values=list(range(0, 1000)), initial_value=15, key='-ZUFALL-START_ABSTAND-')],
-    [sg.Text('Lebenszeit einer Stadt Städte: ')],
+    [sg.Text('Lebenszeit einer Stadt: ')],
     [sg.Spin(values=list(range(0, 1000)), initial_value=60, key='-ZUFALL-LEBENSZEIT-')],
 
 
