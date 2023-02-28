@@ -69,7 +69,7 @@ Die Stadt Sensoren lassen sich mit dem Reiter `Stadt-Sensoren` erreichen. Hier k
 
 ### Stadt Sensor aktivieren / deaktivieren
 
-Hier lässt sich der Sensor aktivieren und deaktivieren. Die Funktionsweise ist hierbei identisch mit dem vorherigen Block `Sensoren zentral aktivieren und deaktivieren`.
+Hier lässt sich der Sensor aktivieren und deaktivieren. Die Funktionsweise ist hierbei identisch mit dem vorherigen Block [Sensoren zentral aktivieren und deaktivieren](#sensoren-zentral-aktivieren-und-deaktivieren).
 
 ### Stadt mit Sensoren hinzufügen
 
