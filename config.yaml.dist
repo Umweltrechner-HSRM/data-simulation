@@ -14,24 +14,24 @@ city_configuration:
 - Wiesbaden:
   - seed: 1
     sensor: pm10
-    taktung: 2
+    taktung: 0.5
   - seed: 1
     sensor: t
-    taktung: 2
+    taktung: 0.5
 - Mainz:
   - seed: 1
     sensor: pm10
-    taktung: 2
+    taktung: 0.5
   - seed: 1
     sensor: t
-    taktung: 2
+    taktung: 0.5
 - Frankfurt:
   - seed: 1
     sensor: pm10
-    taktung: 5
+    taktung: 0.5
   - seed: 1
     sensor: t
-    taktung: 5
+    taktung: 0.5
 heger_spezial:
   city: Schierstein
   id: HegerSpezial1
