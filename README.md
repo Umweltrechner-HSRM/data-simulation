@@ -31,7 +31,7 @@ Das Control Panel lässt sich über den Reiter `Control Panel` erreichen und hat
 
 GUI:
 
-> Unter der Überschrift `Datensimulation status’ lässt sich die Anwendung starten / stoppen, indem man den Knopf `Anwendung starten’ / `Anwendung stoppen’ drückt.
+> Unter der Überschrift `Datensimulation status` lässt sich die Anwendung starten / stoppen, indem man den Knopf `Anwendung starten` / `Anwendung stoppen` drückt.
 
 Terminal:
 
