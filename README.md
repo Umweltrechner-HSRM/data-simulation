@@ -275,3 +275,7 @@ Terminal:
 
 Die Namen der verwendeten Daten haben folgenden Aufbau: <Stadt_Sensorart_UmweltstationID> 
  z.B 'Wiesbaden_temperatur_10869'
+
+![Architektur](./pictures/datensimulation_architektur.png)
+
+Bild

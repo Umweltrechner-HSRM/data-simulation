@@ -28,7 +28,6 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
     def __init__(self):
         self.token = self.get_keycloak_token()
         self.client = self.get_connected_client()
-
     
     # SETUP    
     def ws_error_callback(self):
@@ -64,7 +63,6 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
         response = requests.request("POST", url, data=payload, headers=headers)
         # Access Token zurückgeben
         return response.json()['access_token']
-
 
     # GET REQUESTS
     def get_all_citys_from_backend(self):
@@ -122,7 +120,6 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
                 return result_citys
         return
 
-
     # POST REQUESTS
     def register_sensor(self, id, sensor, city):
         """
@@ -156,10 +153,3 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
         #Logging
         logging.info(f"Folgende Response wird geschickt: {response}")
         return
-
-
-
-
-
-
-

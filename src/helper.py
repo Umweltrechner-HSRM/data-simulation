@@ -76,4 +76,3 @@ def generate_response(id, time, value, city):
     response['value'] = value
     response['city'] = city
     return response
-
