@@ -20,7 +20,6 @@ def setup_logging():
     """
     In dieser Funktion werden die logging einstellungen festgelegt
     """
-    # Logging
     config = get_config()
     log_level = config['log_level']
     logging.basicConfig(
@@ -35,9 +34,8 @@ def setup_logging():
     logging.info("Logging wurde aufgesetzt")
 
 def printTable(myDict, colList=None):
-   """ Pretty print a list of dictionaries (myDict) as a dynamically sized table.
-   If column names (colList) aren't specified, they will show in random order.
-   Author: Thierry Husson - Use it as you want but don't blame me.
+   """ 
+   Ein Dictionary als schöne Tabelle ausgeben
    """
    if not colList: colList = list(myDict[0].keys() if myDict else [])
    myList = [colList] # 1st row = header
@@ -60,14 +58,14 @@ def convert_time_from_iso8601_to_unix_milli_timestamp(iso_time):
 
 def generate_seonsor_name(umweltstation_id, sensor, city):
     """
-    Aus umweltstation_id und sensor Sensornamen generieren
+    Aus umweltstation_id und sensor Sensornamen generiert man hier den Namen/ID für den Sensor
     """
     config = get_config()
     return f'{city}_{config["sensor_details"][sensor]["name"]}_{umweltstation_id}'
 
 def generate_response(id, time, value, city):
     """
-    Erzeugt ein dicitionary aus: id, time, value, city 
+    Erzeugt die Response, welches ein dicitionary aus: id, time, value, city ist
     """
     #Response erzeugen
     response = {}

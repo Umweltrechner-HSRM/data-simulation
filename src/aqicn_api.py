@@ -15,7 +15,6 @@ def get_station_data(uid: str) -> dict or None:
         return
     return response.json()['data']
 
-
 def get_all_stations_from_city(cityname):
     """
     Liste von allen Umweltstationen zu einer Stadt
@@ -60,8 +59,10 @@ def get_biggest_station_of_city(cityname: str) -> str or None:
     logging.info(f"Biggest station in: {cityname} - {station_id}")
     return biggest_station_with_sensor['uid']
 
-
 def get_city_data(city_name: str) -> dict or None:
+    """
+    Holt Daten zu einer Stadt
+    """
     response = requests.get(
         f"https://api.waqi.info/feed/{city_name}/?token={config['aqicn_key']}"
     )

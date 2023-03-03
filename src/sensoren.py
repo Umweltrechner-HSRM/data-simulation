@@ -13,7 +13,12 @@ backend = backend_api.BackendSingleton()
 #Sensorsimulationsmethoden (für die Threads)
 def get_sensor_from_city(sensor, taktung, seed, city):
     """
-    Hier bekommt man die Sensorwerte für eine Stadt
+    Hier wird genau ein 
+    - sensor z.B: Temperatur t
+    - einer bestimmten stadt (city) z.B "Wiesbaden"
+    - mit einer taktung z.B: 1 mal senden pro Sekunde
+    - mit einem seed z.B: +/- 5 verrechnet
+    und anschließend an das Backend gesendet
     """
     #Überprüfen, ob es zu der Stadt Sensordaten gibt
     if not aqicn_api.city_avaiable(city):
@@ -48,6 +53,8 @@ def get_sensor_from_city(sensor, taktung, seed, city):
 def get_heger_spezial(taktung, max_value, min_value):
     """
     Hier solle eine Kurve mit harten Kanten simuliert werden so wie _TT_
+    - taktung -> Wie oft gesendet werden soll
+    - max_value / min_value -> gibt den min und max Wert an welche abwechselnd versendet werden.
     """
     #Wurde der Sensor bereits registriert?
     if config['heger_spezial']['id'] not in backend.get_all_sensors_from_backend():
@@ -74,6 +81,12 @@ def get_heger_spezial(taktung, max_value, min_value):
         time.sleep(taktung)
 
 def random_city_sensor(city, taktung, lifetime):
+    """
+    Sensordaten zufällig neuer Städte werden an das Backend zu schicken.
+    - city -> gibt die Stadt an
+    - taktung -> Wie oft die Sensoren senden sollen
+    - lifetime -> Wie lange die Stadt senden soll. z.B: 60 Nach einer Minute sollen die Sensoren der Stadt aufhören zu senden (für immer)
+    """
     #Sagen, dass die Stadt beginnt zu senden
     print("Random_City: ", city, "beginnt zu senden")
     #Umweltstation zur Stadt finden

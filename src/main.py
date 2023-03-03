@@ -17,7 +17,9 @@ backend = backend_api.BackendSingleton()
 client = backend.client
 
 def starte_stadt_sensoren():
-    #Starte konfigurierte citys
+    """
+    Startet konfigurierte Städte
+    """
     for city in config['city_configuration']:
             current_city = list(city.keys())[0]
             for sensor in city[current_city]:
@@ -26,7 +28,9 @@ def starte_stadt_sensoren():
                 logging.info(f"Starte konfigurierten Sensor ARGS: - Stadt: {current_city} - Sensor: {sensor['sensor']} - Taktung: {sensor['taktung']} - Seed: {sensor['seed']}")
 
 def starte_random_sensoren():
-    # Random city_sensoren
+    """
+    Startet zufällige Städte
+    """
     random_citys = backend.get_number_of_valid_unused_citys(config['random_citys'], config['random_citys_sensors']['anzahl_unterschiedlicher_citys'] )
     print("Random_citys:list: ", random_citys)        
     for city in  random_citys:
@@ -36,7 +40,9 @@ def starte_random_sensoren():
         time.sleep(config['random_citys_sensors']['zeitlicher_abstand_zwischen_den_starts'])
 
 def starte_heger_spezial():
-    #Start Heger Spezial
+    """
+    Startet Heger Spezial
+    """
     heger_thread = Thread(target=sensoren.get_heger_spezial, args=(config['heger_spezial']['taktung'], config['heger_spezial']['max_value'], config['heger_spezial']['min_value']), daemon=True)
     heger_thread.start()
     logging.info(f"Starte Heger Spezial ARGS: - Taktung: {config['heger_spezial']['taktung']} - Max Value: {config['heger_spezial']['max_value']}, - Min value: {config['heger_spezial']['min_value']}")
@@ -60,7 +66,6 @@ def starte_sensoren():
 
 if __name__ == "__main__":
     starte_sensoren()
-
     #Solange der Websocket verbunden ist, werden Daten gesendet
     while True:        
         # Websocketverbindung ist abgebrochen

@@ -7,6 +7,7 @@ import os
 #Directory path ermitteln
 config_path = str(os.path.join(os.path.dirname(__file__), '../config.yaml'))
 city_sensor_path = str(os.path.join(os.path.dirname(__file__), '../data/city_sensor_map.json'))
+
 #config einlesen
 config = yaml.safe_load(open(config_path))
 
@@ -25,7 +26,7 @@ def generate_city_sensor_map(city_list):
     """
     Bekommt eine Liste an Städten gegeben und speichert alle Städte zu denen es Sensordaten gibt.
     Des weiteren könnte ein dict erzeugt werden, welches Sensoren einer Stadt zuordnet.
-    Dies befindet sich in result wird aber nicht gespeichert.
+    Dies befindet sich in result wird aber nicht gespeichert
     """
     result = []
     result2 = []

@@ -67,7 +67,7 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
     # GET REQUESTS
     def get_all_citys_from_backend(self):
         """
-        Gibt alle Städte zurück die es schon Sensordaten gibt.
+        Gibt alle Städte zurück für die es schon Sensordaten gibt
         """
         url = f"{API_BASE_URL}/sensor"
         headers = {
@@ -75,21 +75,25 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
             "Authorization": f"Bearer {self.token}",
         }
         response = requests.request("GET", url, headers=headers)
+        #Fehler Handling
+        if not response:
+            logging.error(f"Fehler bei get_all_citys_from_backend()")
         all_citys = [value['location'] for value in response.json()]
         return all_citys
         
     def get_all_sensors_from_backend(self):
         """
         Diese Methode gibt alle Sensoren zurück, welche bereits in der Datenbank registriert sind
-        api/sensors GET -> Liste von allen registrierten
         """
-        #TODO optimieren im Backend
         url = f"{API_BASE_URL}/sensor"
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.token}",
         }
         response = requests.request("GET", url, headers=headers)
+        #Fehler Handling
+        if not response:
+            logging.error(f"Fehler bei get_all_sensors_from_backend()")
         all_sensors = [value['name'] for value in response.json()]
         return all_sensors
 
@@ -121,7 +125,7 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
     # POST REQUESTS
     def register_sensor(self, id, sensor, city):
         """
-        Diese Methode registriert den Sensor in der Datenbank
+        Diese Methode registriert den Sensor in der Datenbank des Backend
         """
         print("Sensor: ", sensor, " der Stadt: ", city, " wurde neu registriert")
         url = f"{API_BASE_URL}/sensor"
@@ -136,6 +140,11 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
             "Authorization": f"Bearer {self.token}",
         }
         response = requests.request("PUT", url, json=payload, headers=headers)
+
+        #Fehler Handling
+        if not response:
+            logging.error(f"Fehler beim registrieren eines Sensors mit id: {id} mit folgender Response: {response}")
+            
         return
 
     def send_response_to_backend(self, response):

@@ -177,7 +177,7 @@ def save_yaml():
 
 def yaml_to_json(yaml_element):
     """
-    Hier konvertiert man yaml zu Json, da nur dieses schön in der GUI anzeigen kann
+    Hier konvertiert man yaml zu Json, da man nur dieses schön in der GUI anzeigen kann
     """
     return json.dumps(yaml_element, indent=2, ensure_ascii=False)  
 
@@ -249,8 +249,7 @@ def load_einstellungen():
     window['-BACKEND_API_WS-'].update(value=config['backend']['api_ws_url'])
     window['-BACKEND_LOGGING-'].update(value=config['log_level'])
     window['-BACKEND_SEND_RESPONSE_PATH-'].update(value=config['backend']['send_response_path'])
-    window['-INFORMATION_MAP-'].update(value=yaml_to_json(config['sensor_details']))
-    
+    window['-INFORMATION_MAP-'].update(value=yaml_to_json(config['sensor_details']))    
 
 
 # HILFSVARIABLEN
@@ -271,7 +270,7 @@ load_control_panel()
 while True:    
     event, values = window.read(timeout=100, timeout_key='-TIMEOUT-')        
 
-    # CLOSE UI
+    # UI schließen
     if event == sg.WIN_CLOSED:        
         break
 
