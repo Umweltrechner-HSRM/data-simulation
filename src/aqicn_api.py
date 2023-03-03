@@ -5,6 +5,9 @@ config = helper.get_config()
 
 #AQICN-API Funktionen
 def get_station_data(uid: str) -> dict or None:
+    """
+    Gibt die Daten einer bestimmten Wetterstation zurück. Die Wetterstation wird mit Hilfe einer ID angegeben
+    """
     response = requests.get(
         f"https://api.waqi.info/feed/@{uid}/?token={config['aqicn_key']}"
     )
@@ -14,7 +17,9 @@ def get_station_data(uid: str) -> dict or None:
 
 
 def get_all_stations_from_city(cityname):
-    #Liste von allen Umweltstationen zu einer Stadt
+    """
+    Liste von allen Umweltstationen zu einer Stadt
+    """
     station_ids = []
     #Anfrage an API
     response = requests.get(

@@ -7,7 +7,7 @@ import helper
 import logging
 
 #Initalize Logging
-helper.setup_login()
+helper.setup_logging()
 
 #config einlesen
 config = helper.get_config()

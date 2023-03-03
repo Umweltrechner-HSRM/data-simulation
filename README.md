@@ -293,7 +293,7 @@ Terminal:
 Im folgende wird erklärt wie das Skript auf der technischen Seite funktioniert. Dabei wird sich auf obige Abbildung bezogen. Im wesentlichen besteht das Programm aus 8 Dateien. Das wären zum einen die `config.yaml`, das `data-simulation.log` im Ordner `logs` und den Python Dateien: `konfiguration_gui.py`, `main.py`, `sensoren.py`, `aqicn_api.py`, `backend_api.py`, `helper.py` und `sinleton.py`.
 Gehen wir nun die Gesamtanwendung einmal logisch durch. Hierbei gehen wir nicht komplett in die Tiefe. Dafür muss man dann explizit in den Code gehen, welcher aber auch dokumetiert ist:
 
-- Wenn man die `konfiguration_gui.py` aufruft bekommt man eine grafische Oberfläche mit der man alle Einstellungen an der Awendung vornehmen kann. Unter der Haube wirkt sich das dann auf die `config.yaml` aus wecher alle Konfigurationen festgehalten sind. Alle Konfigurationsmöglichkeiten wurde bereits in der [Anwenderdokumentation](#anwender-dokumentation) genau beschrieben, weshalb darauf jetzt nicht mehr eingegangen wird.
+- Wenn man die `konfiguration_gui.py` aufruft bekommt man eine grafische Oberfläche mit der man alle Einstellungen an der Awendung vornehmen kann. Unter der Haube wirkt sich das dann auf die `config.yaml` aus wecher alle Konfigurationen festgehalten sind. Alle Konfigurationsmöglichkeiten wurde bereits in der [Anwenderdokumentation](#anwender-dokumentation) genau beschrieben, weshalb darauf jetzt nicht mehr eingegangen wird. Für die technische Umsetzung der GUI wird das Modul PySimpleGUI genutzt.
 
 - Alle im folgenden vorgestellten Python Dateien loggen in die Datei `data-simulation.log` im Ordner `logs`. Die einezelenen Loglevel und wie man diese anpassen kann, wurde bereits in der [Logging Konfiguration](#logging-konfiguration).
 
@@ -302,15 +302,36 @@ Die Idee hinter den Threads ist es eine echte Parellelisierung mehrerer Sensoren
 
 - Die Threads haben leider den Nachteil, dass sie alle eine eigene Verbindung zum Backend aufbauen würden, was insbesondere bei einer hohen Anzahl von Sensoren nicht performant wäre. Deswegen wird das Singleton Entwurfmuster genutzt. Dieses stellt sicher, dass von einer gewissen Instanz nur ein Objekt erstellt werden kann. Dies ist nützlich da sonst alle Sensoren, welche alle auf eigenen Threads laufen auch eine eigene Verbindung zum Backend herstellen würden. So können sich alle Sensoren ein einziges Backend Objekt "teilen", wodurch die Performance erhöht wird und das Programm konsistent ist. Realisiert wird das in mit der Datei `singleton.py`
 
-- Die drei unterschiedlichen Sensorarten werden in der Datei `sensoren.py` ausprogrammiert. Der Unterschied zwischen den drei Sensorarten wurde bereits bei [Stadt Sensoren](#stadt-sensoren), [Zufällige Städte](#zufällige-städte) und [Heger Sensor](#heger-sensor) erklärt. Hier wird jetzt beschriben, wie das ganze auf der technischen Seite funktioniert. Alle Sensoren haben gemeinsam, dass sie erst überprüfen, ob der Sensor bereits im Backend gespeichert ist. Sollte dies nicht der Fall sein wird der Sensor zuerst registriert.
+- Die drei unterschiedlichen Sensorarten werden in der Datei `sensoren.py` ausprogrammiert. Der Unterschied zwischen den drei Sensorarten wurde bereits bei [Stadt Sensoren](#stadt-sensoren), [Zufällige Städte](#zufällige-städte) und [Heger Sensor](#heger-sensor) erklärt. Hier wird jetzt beschriben, wie das ganze auf der technischen Seite funktioniert. Alle Sensoren haben gemeinsam, dass sie erst überprüfen, ob der Sensor bereits im Backend gespeichert ist. Sollte dies nicht der Fall sein wird der Sensor zuerst beim Backend registriert. Danach stellen alle Sensoren ein Ergbenis zusammen, welches anschließend an das Backend geschickt wird. Dieses Ergbenis ist bei allen Sensoren gleich aufgebaut. Genauer beschrieben wird dies im Anschluss unter [Sensor Namen und Daten Konventionen](#sensor-namen-und-daten-konventionen). Allerdings haben die drei Sensorarten unterschiedliche Wege, um an Ihre Daten zu gelangen.
+
+  - Die `Stadt Sensoren` funktionieren, indem es für jeden einzelnen Sensor in einer Stadt einen Thread gibt. Jeder dieser Threads ruft dann von AQICN API die aktuellen Wetterdaten ab. Von der Schnittstelle erhält man als Antwort immer alle Sensoren. Ein Beispiel lässt sich unter [AQICN Response](#aqicn-response) finden. Der Thread filtert sich dann den einen Sensor Wert heraus den er reppräsentieren soll.
+
+  - Bei den `Zufälligen Städten` funktioniert dies ein kleinwenig anders. Würde man hier die gleiche Logik verwenden, wie bei den `Stadt Sensoren` würden zu viele Anfragen and die AQICN API gestellt werden. Ein Beispiel: Hätte man 100 zufällige Städt mit jeweils 10 Sensoren und jeder Sensor würde alle 10 Sekunden seine Daten verschicken. Dann wären dass 6000 API Requests in einer Minute. Um diese Anzahl zu reduzieren, wird bei den zufälligen Städten der Ansatz verfolgt, dass es für jede Stadt einen Thread gibt und dieser eine Thread für alle Sensoren die Daten ausließt und verschickt. So lässt sich im obigen Beispiel die Anzahl von API Requests von 6000 API Requests in einer Minute auf 600 API Requests in einer Minute reduzieren.
+
+  - Zu guter letzt gibt es noch den `Heger Sensor` dieser bekommt einen min und einen max Wert vom Nutzer übergeben (steht in der `config.yaml`). Diese Werte sollen im Wechsel versendet werden. Deswegen sind hier die Timestamps die einzige interssante Berechnung. Diese Timestamps müssen nämlich möglichst nahe aneinender liegen, um später im Graph eine möglichst harte Kante zu erzeugen.
+
+- Für die Kommunikation mit der Wetterschnittstelle ist die Datei `aqicn_api.py` verantwortlich. Neben einiger Hilfsfunktionen kann die Schnittstelle im wesentlichen eine Liste von Wetterstation zu einer Stadt ausgeben und anahand dieser Wetterstationen kann man dann auch ihre zugehörigen Sensor Werte abfragen. Genauso ist es auch möglich sich die Wetterdaten zu einer Stadt zu holen. Hier kann sich jedoch die Anzahl von Sensoren unterscheiden, weshalb ich diese Möglichkeit nicht optimal fand. Die Hilfsfunktionen dienen dazu, um zu schauen, ob es für eine Stadt Wetterstationen gibtund um für eine Stadt genau die Wetterstation zu finden, welche an meisten Sensoren hat und um zu schauen über welche Sensoren eine Wettersattion verfügt.
+
+- Für die Kommunikation mit dem Backend ist die Datei `backend_api.py` verantwortlich. Hier wird auch der bereits zuvor beschriebene Singleton Ansatz verwendet. Alle möglichen Einstellungmöglichkeiten lassen sich auch hier wieder in der `config.yaml` verändern und wurde bereits bei [Backend Konfiguration](#backend-konfiguration) beschriben Hier gibt es zwei Hauptaufgaben:
+
+  - Setup: Hier wird zum einem die Verbidnung zum Websocket hergestellt, an welchen später die Daten gesendet werden und zum anderen wird auch die Verbindung zu der REST Schnittstelle hergestellt. Um mit dieser kommunizieren zu können benötigt man einen Token. Um diesen zu erhalten nutzen wir Keycloak. Dort muss man sich mit Nutzername und Passwort authentifizieren um einen gültigen Token zu erhalten.
+
+  - Get Requests: Hier kann man alle Städte und Sensoren abfragen, welche bereits im Backend registriert sind
+
+  - Post Requests: Hier kann man zum einem neuen Sensoren in der Datenbank registrieren und zum anderen Sensordaten an das Backend schicken.
+
+- In der `helper.py` befinden sich alle Funtkionen, welche von den anderen Systemen genutzt werden, aber sich nicht klar einer bestimmten Funktion zu ordnen lassen. Dazu zählen zum Beispiel das Logging aufzusetzen. Der Zugriff auf die config und das generieren der Standartantwort der Sensoren
 
 ### Mögliche Sensordaten
 
 
-### Sensor Namen Konventione
+### Sensor Namen und Daten Konventionen
 
 Die Namen der verwendeten Daten haben folgenden Aufbau: `<Stadt_Sensorart_UmweltstationID>` 
  z.B 'Wiesbaden_temperatur_10869'
+
+
+### AQICN Response
 
 ### Form der Date welche im Backend ankommen
 

@@ -16,7 +16,7 @@ def get_config():
     config = yaml.safe_load(open(config_path, encoding='utf-8'))
     return config
 
-def setup_login():
+def setup_logging():
     """
     In dieser Funktion werden die logging einstellungen festgelegt
     """

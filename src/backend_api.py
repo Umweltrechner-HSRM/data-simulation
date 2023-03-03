@@ -67,9 +67,7 @@ class BackendSingleton(metaclass=singleton.SingletonMeta):
     # GET REQUESTS
     def get_all_citys_from_backend(self):
         """
-        Brauche ich für die random citys. Es soll eine Liste zurückgebgen (aus dem be), welche alle 
-        vertretenen Städte zurückgibt.
-        SQL Kinda: "SELECT DISTICT city FROM tabelle;"
+        Gibt alle Städte zurück die es schon Sensordaten gibt.
         """
         url = f"{API_BASE_URL}/sensor"
         headers = {
