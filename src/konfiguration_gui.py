@@ -19,7 +19,6 @@ with open(config_path, 'r', encoding='utf-8') as file:
 # Theme festlegen
 sg.theme('DarkTeal9')
 
-
 # SPALTEN-LAYOUT
 # statisches Menü
 menue_column = [

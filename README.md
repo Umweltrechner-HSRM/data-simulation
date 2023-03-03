@@ -294,7 +294,7 @@ Terminal:
 Im folgende wird erklärt wie das Skript auf der technischen Seite funktioniert. Dabei wird sich auf obige Abbildung bezogen. Im wesentlichen besteht das Programm aus 8 Dateien. Das wären zum einen die `config.yaml`, das `data-simulation.log` im Ordner `logs` und den Python Dateien: `konfiguration_gui.py`, `main.py`, `sensoren.py`, `aqicn_api.py`, `backend_api.py`, `helper.py` und `sinleton.py`.
 Gehen wir nun die Gesamtanwendung einmal logisch durch. Hierbei gehen wir nicht komplett in die Tiefe. Dafür muss man dann explizit in den Code gehen, welcher aber auch dokumetiert ist:
 
-- Wenn man die `konfiguration_gui.py` aufruft bekommt man eine grafische Oberfläche mit der man alle Einstellungen an der Awendung vornehmen kann. Unter der Haube wirkt sich das dann auf die `config.yaml` aus wecher alle Konfigurationen festgehalten sind. Alle Konfigurationsmöglichkeiten wurde bereits in der [Anwenderdokumentation](#anwender-dokumentation) genau beschrieben, weshalb darauf jetzt nicht mehr eingegangen wird. Für die technische Umsetzung der GUI wird das Modul PySimpleGUI genutzt.
+- Wenn man die `konfiguration_gui.py` aufruft bekommt man eine grafische Oberfläche mit der man alle Einstellungen an der Awendung vornehmen kann. Unter der Haube wirkt sich das dann auf die `config.yaml` aus wecher alle Konfigurationen festgehalten sind. Alle Konfigurationsmöglichkeiten wurde bereits in der [Anwenderdokumentation](#anwender-dokumentation) genau beschrieben, weshalb darauf jetzt nicht mehr eingegangen wird. Für die technische Umsetzung der GUI wird das Modul PySimpleGUI genutzt. Hierzu werden du erst für das statisches Menü, das Control Panel, Stadt/Zufälligen/Herger-Sensoren und die Einstellungen Spalten mit ihren inneren Elementen angelegt. Danach werden diese Spalten in einem Layout angeordnet und festgelegt welche Spalten sichtbar und welche unsichtbar sein sollen. Danach folgen einige Hilfsfunktionen, welche die Anwendung benötigt. Danach gibt es zu jeder Spalte ein Methode, welche die richtigen Daten aus der `config.yaml` in die Spalte lädt. Nun folgt die Logik des Programms. Diese stellt sicher, dass man zwischen den Spalten mit einem Knopfdruck wechseln kann, dass man Veränderungen speichern kann und diese anschließend direkt angezeigt werden und dass sich dass Programm starten / stoppen lässt und beim laufenden Programm die Logs angezeigt werden. Zum starten und stoppen des Programms, wird hier die `main.py` in einem Subprocess gestartet bzw. der Subprocess gekillt.
 
 - Alle im folgenden vorgestellten Python Dateien loggen in die Datei `data-simulation.log` im Ordner `logs`. Die einezelenen Loglevel und wie man diese anpassen kann, wurde bereits in der [Logging Konfiguration](#logging-konfiguration).
 
@@ -323,18 +323,206 @@ Die Idee hinter den Threads ist es eine echte Parellelisierung mehrerer Sensoren
 
 - In der `helper.py` befinden sich alle Funtkionen, welche von den anderen Systemen genutzt werden, aber sich nicht klar einer bestimmten Funktion zu ordnen lassen. Dazu zählen zum Beispiel das Logging aufzusetzen. Der Zugriff auf die config und das generieren der Standartantwort der Sensoren
 
-### Mögliche Sensordaten
-
-
 ### Sensor Namen und Daten Konventionen
 
-Die Namen der verwendeten Daten haben folgenden Aufbau: `<Stadt_Sensorart_UmweltstationID>` 
- z.B 'Wiesbaden_temperatur_10869'
+Die Namen der verwendeten Daten haben folgenden Aufbau: `<Stadt_Sensorart_UmweltstationID>`
+Die an das Backend versendeten Daten sehen dann folgendermaßen aus:
 
+```json
+{
+  "id": "Wiesbaden_temperatur_10869",
+  "timestamp": 1675242191733.671,
+  "value": 3.5, 
+  "city": "Wiesbaden"
+}
+```
+
+- `ìd`: hieran lässt sich der Sensor eindeutig identifzieren
+- `timestamp`: Das ist der Zeitpunkt wann der Wert erzeugt wurde. Hierbei handelt es sich um einen UNIX Timestamp
+- `value`: Wert des Sensors
+- `city`: Die Stadt aus der die Daten stammen
 
 ### AQICN Response
 
-### Form der Date welche im Backend ankommen
+Die Schnittstelle von der wir unsere Daten beziehen heißt `AQICN API``. [Hier](https://aqicn.org/city/germany/hesse/wiesbaden-schiersteiner-str./) kommt man zu deren Website. [Hier](https://aqicn.org/api/de/) kommt man zu der allgemeinen Schnittstellenbeschreibung und [hier](https://aqicn.org/json-api/doc/) zu der Json Beschreibung.
+Eine klassische Antwort der AQICN API, aus welcher wir die Daten für das Backend beziehen sieht folgendermaßen aus:
+
+```json
+{
+  "status": "ok",
+  "data": {
+      "aqi": 73,
+      "idx": 10850,
+      "attributions": [
+          {
+              "url": "https://www.hlnug.de/",
+              "name": "Hessian State Office for Nature Conservation, Environment and Geology - (Hessisches Landesamt für Naturschutz, Umwelt und Geologie)",
+              "logo": "Germany-Hesse.png"
+          },
+          {
+              "url": "https://waqi.info/",
+              "name": "World Air Quality Index Project"
+          }
+      ],
+      "city": {
+          "geo": [
+              50.078333333333,
+              8.2313888888889
+          ],
+          "name": "Wiesbaden-Ringkirche, Germany",
+          "url": "https://aqicn.org/city/germany/hesse/wiesbaden-ringkirche",
+          "location": ""
+      },
+      "dominentpol": "pm25",
+      "iaqi": {
+          "co": {
+              "v": 0.1
+          },
+          "h": {
+              "v": 61
+          },
+          "no2": {
+              "v": 19.2
+          },
+          "o3": {
+              "v": 17.4
+          },
+          "p": {
+              "v": 1027.9
+          },
+          "pm10": {
+              "v": 22
+          },
+          "pm25": {
+              "v": 73
+          },
+          "so2": {
+              "v": 0.5
+          },
+          "t": {
+              "v": 6.8
+          },
+          "w": {
+              "v": 2.2
+          }
+      },
+      "time": {
+          "s": "2023-03-03 12:00:00",
+          "tz": "+01:00",
+          "v": 1677844800,
+          "iso": "2023-03-03T12:00:00+01:00"
+      },
+      "forecast": {
+          "daily": {
+              "o3": [
+                  {
+                      "avg": 20,
+                      "day": "2023-03-03",
+                      "max": 33,
+                      "min": 14
+                  },
+                  {
+                      "avg": 26,
+                      "day": "2023-03-04",
+                      "max": 30,
+                      "min": 19
+                  },
+                  {
+                      "avg": 25,
+                      "day": "2023-03-05",
+                      "max": 32,
+                      "min": 17
+                  },
+                  {
+                      "avg": 18,
+                      "day": "2023-03-06",
+                      "max": 32,
+                      "min": 13
+                  },
+                  {
+                      "avg": 19,
+                      "day": "2023-03-07",
+                      "max": 21,
+                      "min": 19
+                  }
+              ],
+              "pm10": [
+                  {
+                      "avg": 18,
+                      "day": "2023-03-03",
+                      "max": 24,
+                      "min": 12
+                  },
+                  {
+                      "avg": 15,
+                      "day": "2023-03-04",
+                      "max": 25,
+                      "min": 12
+                  },
+                  {
+                      "avg": 12,
+                      "day": "2023-03-05",
+                      "max": 16,
+                      "min": 7
+                  },
+                  {
+                      "avg": 17,
+                      "day": "2023-03-06",
+                      "max": 28,
+                      "min": 9
+                  },
+                  {
+                      "avg": 14,
+                      "day": "2023-03-07",
+                      "max": 14,
+                      "min": 12
+                  }
+              ],
+              "pm25": [
+                  {
+                      "avg": 61,
+                      "day": "2023-03-03",
+                      "max": 73,
+                      "min": 43
+                  },
+                  {
+                      "avg": 42,
+                      "day": "2023-03-04",
+                      "max": 68,
+                      "min": 32
+                  },
+                  {
+                      "avg": 37,
+                      "day": "2023-03-05",
+                      "max": 52,
+                      "min": 23
+                  },
+                  {
+                      "avg": 57,
+                      "day": "2023-03-06",
+                      "max": 76,
+                      "min": 27
+                  },
+                  {
+                      "avg": 54,
+                      "day": "2023-03-07",
+                      "max": 54,
+                      "min": 47
+                  }
+              ]
+          }
+      },
+      "debug": {
+          "sync": "2023-03-03T21:59:06+09:00"
+      }
+  }
+}
+```
 
 ### Helper Scripts
 
+Unter dem Ordner `helper_scripts` lässt sich die Datei `get_citys_with_sensors.py` finden. Diese Hilfsfunktion kann aus einer Liste von vielen Städten diejenigen heruasfilter, für welche es Sensordaten gibt. Die Liste der Städte, welche kontrolliert werden soll befindet sich im Ordner `data` und heitßt `liste_aller_städte.json`. Die gefilterten Städte werden dann im selben Ordner unter dem Namen `city_sensor_map.json` gespeichert. Das Skript lässt sich dann mit folgendem Befehl ausführen:
+
+```shell
+python ./helper_scripts/get_citys_with_sensors.py
+```
