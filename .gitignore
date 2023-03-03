@@ -1,4 +1,5 @@
 buffer/
 logs/*
+!logs/.gitkeep 
 config.yaml
 src/__pycache__/
