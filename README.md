@@ -63,7 +63,22 @@ Terminal:
 
 ### Stadt Sensoren
 
-Die Stadt Sensoren lassen sich mit dem Reiter `Stadt-Sensoren` erreichen. Hier kann man explizit gewünschte Städte und ihre Sensoren festlegen, deren Daten empfangen werden sollen. Diese einzelnen Sensoren lassen sich weiter konfigurieren. Zum einen kann angegeben werden, in was für einem Sekundentakt Daten versendet werden sollen. Zum anderen besteht die Möglichkeit, einen Seed anzugeben, welcher künstliche Schwankungen bei den Werten erzeugt, indem eine Zahl in der Range -seed zu +seed gewählt und mit dem echten Wert verrechnet wird.
+Die Stadt Sensoren lassen sich mit dem Reiter `Stadt-Sensoren` erreichen. Hier kann man explizit gewünschte Städte und ihre Sensoren festlegen, deren Daten empfangen werden sollen. Diese einzelnen Sensoren lassen sich weiter konfigurieren. Zum einen kann angegeben werden, in was für einem Sekundentakt Daten versendet werden sollen. Zum anderen besteht die Möglichkeit, einen Seed anzugeben, welcher künstliche Schwankungen bei den Werten erzeugt, indem eine Zahl in der Range -seed zu +seed gewählt und mit dem echten Wert verrechnet wird. Es gibt folgende mögliche Sesoren:
+
+- PM25 (lungengängiger Feinstaub)
+- PM10 (einatembarer Feinstaub)
+- O3 (Ozon)
+- NO2 (Stickstoffdioxid)
+- SO2 (Schwefeldioxid)
+- CO (Kohlenstoffmonoxid)
+- t (Temperatur)
+- p (Pressure/Luftdruck)
+- h (humidity/Feuchtigkeit)
+- w (Wind)
+- wg (höchste Windgschwindigket des Tages)
+- dew (Taupunkt)
+
+Je nachdem welche Stadt angeben wird kann die Vielfalt der Sensoren schwanken. So gibt es in Mainz z.B relativ wenig Daten, während man in Wiesbaden relativ vielegibt
 
 ![stadt-sensoren](./pictures/stadt-sensoren.png)
 
@@ -222,7 +237,7 @@ Terminal:
 
 > Die gleichen Konfigurationen lassen sich auch in der `config.yaml` unter dem Punkt `backend` vornehmen. Auch hier sind die Attributnamen nicht deckungsgleich, aber aus dem Kontext ersichtlich.
 
-### Logging
+### Logging Konfiguration
 
 Hier kann das Loglevel ausgewählt werden. Es gibt folgende Auswahlmöglichkeiten:
 
@@ -271,11 +286,33 @@ Terminal:
 
 ## Technische Dokumentation
 
-### Sensor Namen
-
-Die Namen der verwendeten Daten haben folgenden Aufbau: <Stadt_Sensorart_UmweltstationID> 
- z.B 'Wiesbaden_temperatur_10869'
+### Big Picture
 
 ![Architektur](./pictures/datensimulation_architektur.png)
 
-Bild
+Im folgende wird erklärt wie das Skript auf der technischen Seite funktioniert. Dabei wird sich auf obige Abbildung bezogen. Im wesentlichen besteht das Programm aus 8 Dateien. Das wären zum einen die `config.yaml`, das `data-simulation.log` im Ordner `logs` und den Python Dateien: `konfiguration_gui.py`, `main.py`, `sensoren.py`, `aqicn_api.py`, `backend_api.py`, `helper.py` und `sinleton.py`.
+Gehen wir nun die Gesamtanwendung einmal logisch durch. Hierbei gehen wir nicht komplett in die Tiefe. Dafür muss man dann explizit in den Code gehen, welcher aber auch dokumetiert ist:
+
+- Wenn man die `konfiguration_gui.py` aufruft bekommt man eine grafische Oberfläche mit der man alle Einstellungen an der Awendung vornehmen kann. Unter der Haube wirkt sich das dann auf die `config.yaml` aus wecher alle Konfigurationen festgehalten sind. Alle Konfigurationsmöglichkeiten wurde bereits in der [Anwenderdokumentation](#anwender-dokumentation) genau beschrieben, weshalb darauf jetzt nicht mehr eingegangen wird.
+
+- Alle im folgenden vorgestellten Python Dateien loggen in die Datei `data-simulation.log` im Ordner `logs`. Die einezelenen Loglevel und wie man diese anpassen kann, wurde bereits in der [Logging Konfiguration](#logging-konfiguration).
+
+- Der erste Programmaufruf beginnt stets mit der `main.py`. Diese stellt eine Verbindung zum Backend her und schaut in der `config.yaml` nach allen Sensoren, welche aktviert werden sollen. Diese werden dann in einem neuem Thread gestartet. Eine Besonderheit stellen hierbei die zufälligen Städte da. Hier werden je nach Anzahl der unterschiedlichen Städte direkt mehrere Threads für jede Stadt gestartet.
+Die Idee hinter den Threads ist es eine echte Parellelisierung mehrerer Sensoren zu erzeuge, wie es auch im echte Leben der Fall wäre.
+
+- Die Threads haben leider den Nachteil, dass sie alle eine eigene Verbindung zum Backend aufbauen würden, was insbesondere bei einer hohen Anzahl von Sensoren nicht performant wäre. Deswegen wird das Singleton Entwurfmuster genutzt. Dieses stellt sicher, dass von einer gewissen Instanz nur ein Objekt erstellt werden kann. Dies ist nützlich da sonst alle Sensoren, welche alle auf eigenen Threads laufen auch eine eigene Verbindung zum Backend herstellen würden. So können sich alle Sensoren ein einziges Backend Objekt "teilen", wodurch die Performance erhöht wird und das Programm konsistent ist. Realisiert wird das in mit der Datei `singleton.py`
+
+- Die drei unterschiedlichen Sensorarten werden in der Datei `sensoren.py` ausprogrammiert. Der Unterschied zwischen den drei Sensorarten wurde bereits bei [Stadt Sensoren](#stadt-sensoren), [Zufällige Städte](#zufällige-städte) und [Heger Sensor](#heger-sensor) erklärt. Hier wird jetzt beschriben, wie das ganze auf der technischen Seite funktioniert. Alle Sensoren haben gemeinsam, dass sie erst überprüfen, ob der Sensor bereits im Backend gespeichert ist. Sollte dies nicht der Fall sein wird der Sensor zuerst registriert.
+
+### Mögliche Sensordaten
+
+
+### Sensor Namen Konventione
+
+Die Namen der verwendeten Daten haben folgenden Aufbau: `<Stadt_Sensorart_UmweltstationID>` 
+ z.B 'Wiesbaden_temperatur_10869'
+
+### Form der Date welche im Backend ankommen
+
+### Helper Scripts
+
